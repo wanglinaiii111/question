@@ -1,5 +1,5 @@
 <template>
-  <div id="loyout">
+  <div id="layout">
     <el-container>
       <layoutAside></layoutAside>
       <el-container>
@@ -10,7 +10,7 @@
           </transition>
         </el-main>
         <el-footer>
-          <Bottom></Bottom>
+          <!-- <Bottom></Bottom> -->
         </el-footer>
       </el-container>
     </el-container>
@@ -20,15 +20,13 @@
 <script>
 import layoutAside from "./aside/aside"
 import layoutHeader from "./header/header"
-import Bottom from "./Footer/bottom"
-import langSelect from "../../components/lang/langSelect"
+// import Bottom from "./Footer/bottom"
 
 export default {
   name: "layout",
   components: {
     layoutHeader,
-    Bottom,
-    langSelect,
+    // Bottom,
     layoutAside
   }
 }
@@ -85,8 +83,13 @@ export default {
     cursor: pointer;
   }
 
-  html, body, #loyout, .el-container, #asideNav, ul.el-menu {
+  html, body, #layout, .el-container, #asideNav, ul.el-menu {
     @extend %h100;
+  }
+
+  #layout .el-footer{
+    height:0px !important;
+    line-height: 0px;
   }
 
   @mixin set-value($side, $value) {
