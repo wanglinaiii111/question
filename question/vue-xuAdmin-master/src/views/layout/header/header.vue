@@ -7,6 +7,9 @@
           <el-tooltip class="item" effect="dark" content="全屏" placement="bottom"><i
             class="fa fa-arrows-alt fa-lg"></i></el-tooltip>
         </li>
+        <li>
+          <langSelect></langSelect>
+        </li>
         <li>{{ $t(`role.${this.$store.getters.info.role}`) }}</li>
         <li>
           <el-dropdown @command="handleCommand">
@@ -31,13 +34,14 @@
 
 <script>
 import Cookies from "js-cookie"
+import langSelect from "../../../components/lang/langSelect"
 import tabNav from "./tabNav"
 import UserInfo from "../../../components/userForm/userInfo"
 import EditPassword from "../../../components/userForm/editPassword"
 
 export default {
   name: "Header",
-  components: {EditPassword, tabNav, UserInfo},
+  components: {EditPassword, tabNav, langSelect, UserInfo},
   data () {
     return {
       isfullScreen: true,
