@@ -8,6 +8,10 @@
 import enLocale from "element-ui/lib/locale/lang/en"
 const en = {
   routeName: {
+    memberPermissions: "memberPermissions",
+    studentManage: "studentManage",
+    classManage: "classManage",
+
     home: "home",
     article: "article",
     publishArticle: "publishArticle",

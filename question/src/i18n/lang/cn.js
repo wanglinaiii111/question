@@ -7,6 +7,10 @@
 import zhLocale from "element-ui/lib/locale/lang/zh-CN"
 const cn = {
   routeName: {
+    memberPermissions: "成员管理",
+    studentManage: "学生管理",
+    classManage: "班级管理",
+
     home: "主页",
     article: "文章管理",
     publishArticle: "发表文章",

@@ -28,6 +28,10 @@ const NavClassify = () => import("@/views/syssetting/navClassify")
 const pagePermissions = () => import("@/views/permissions/pagePermissions")
 const btnPermissions = () => import("@/views/permissions/btnPermissions")
 
+const memberPermissions = () => import("@/views/memberPermissions")
+const studentManage = () => import("@/views/studentManage")
+const classManage = () => import("@/views/classManage")
+
 /**
  * 重写路由的push方法
  */
@@ -148,7 +152,14 @@ let addRouter = [
         name: routeName.btnControl,
         component: btnPermissions,
         children: []
-      }
+      },
+      // {
+      //   path: "/memberPermissions",
+      //   iconCls: "fa fa-user-circle-o", // 图标样式class
+      //   name: routeName.memberControl,
+      //   component: MemberPermissions,
+      //   children: []
+      // }
     ]
   },
   {
@@ -306,6 +317,57 @@ let addRouter = [
         iconCls: "el-icon-menu", // 图标样式class
         name: routeName.navMenu,
         component: NavClassify,
+        children: []
+      }
+    ]
+  },
+  {
+    path: "/studentManage",
+    iconCls: "fa fa-id-card-o", // 图标样式class
+    name: routeName.studentManage,
+    meta: {role: ["superAdmin"]},
+    component: Layout,
+    alone: true,
+    children: [
+      {
+        path: "/studentManage",
+        iconCls: "fa fa-id-card-o", // 图标样式class
+        name: "studentManage",
+        component: studentManage,
+        children: []
+      }
+    ]
+  },
+  {
+    path: "/classManage",
+    iconCls: "fa fa-newspaper-o", // 图标样式class
+    name: routeName.classManage,
+    meta: {role: ["superAdmin"]},
+    component: Layout,
+    alone: true,
+    children: [
+      {
+        path: "/classManage",
+        iconCls: "fa fa-newspaper-o", // 图标样式class
+        name: "classManage",
+        component: classManage,
+        children: []
+      }
+    ]
+  },
+  {
+    path: "/memberPermissions",
+    iconCls: "fa fa-user-circle-o", // 图标样式class
+    name: routeName.memberPermissions,
+    meta: {role: ["superAdmin"]},
+    component: Layout,
+    alone: true,
+    children: [
+      {
+        path: "/memberPermissions",
+        iconCls: "fa fa-user-circle-o", // 图标样式class
+        name: "memberPermissions",
+        component: memberPermissions,
         children: []
       }
     ]
