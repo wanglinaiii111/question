@@ -175,7 +175,7 @@ app.use(
     )
 );
 
-const ignoreList = ['.exe', '.rar', '.docx', '.pptx', '/login/login', '/login/logout', '/login/getKey', 'getLoginPageEquipmentStatus'];
+const ignoreList = ['.exe', '.rar', '.docx', '.pptx', '/user/login', '/user/logout'];
 app.use(function (req, res, next) {
     console.log(req.session.userId);
 
