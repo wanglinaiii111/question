@@ -1,52 +1,52 @@
 <template>
   <div>
-    <h3>筛选</h3>
-    <p>对表格进行筛选，可快速查找到自己想看的数据。</p>
     <template>
-      <el-table
-        :data="tableData5"
-        style="width: 100%">
-        <el-table-column
-          prop="date"
-          label="日期"
-          sortable
-          width="180"
-          :filters="[{text: '2016-05-01', value: '2016-05-01'}, {text: '2016-05-02', value: '2016-05-02'}, {text: '2016-05-03', value: '2016-05-03'}, {text: '2016-05-04', value: '2016-05-04'}]"
-          :filter-method="filterHandler"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="name"
-          label="姓名"
-          width="180">
-        </el-table-column>
-        <el-table-column
-          prop="address"
-          label="地址"
-          :formatter="formatter">
-        </el-table-column>
-        <el-table-column
-          prop="tag"
-          label="标签"
-          width="100"
-          :filters="[{ text: '家', value: '家' }, { text: '公司', value: '公司' }]"
-          :filter-method="filterTag"
-          filter-placement="bottom-end">
-          <template slot-scope="scope">
-            <el-tag
-              :type="scope.row.tag === '家' ? 'primary' : 'success'"
-              disable-transitions>{{scope.row.tag}}</el-tag>
-          </template>
-        </el-table-column>
+      <div class="card">
+        <el-form :inline="true" :model="formInline">
+          <el-form-item label="年级">
+            <el-date-picker
+              v-model="formInline.level"
+              type="year"
+              value-format="yyyy"
+              placeholder="选择年级"
+              size="medium"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="班号">
+            <el-input
+              v-model="formInline.cno"
+              size="medium"
+              placeholder="班号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" size="medium" @click="onSubmit"
+              >查询</el-button
+            >
+          </el-form-item>
+        </el-form>
+      </div>
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="sname" label="学生姓名"></el-table-column>
+        <el-table-column prop="sno" label="学号"></el-table-column>
+        <el-table-column prop="sex" label="性别"></el-table-column>
+        <el-table-column prop="level" label="年级"></el-table-column>
+        <el-table-column prop="cno" label="班级"> </el-table-column>
+        <el-table-column prop="headteacher" label="班主任"> </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button
-              size="mini"
-              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <!-- <el-button size="mini" @click="handleEdit(scope.$index, scope.row)"
+              >编辑</el-button
+            > -->
+            <el-popconfirm
+              title="确定删除该名学生吗？"
+              @confirm="handleDelete(scope.row)"
+            >
+              <el-button slot="reference" size="mini" type="danger"
+                >删除</el-button
+              >
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -56,65 +56,107 @@
 
 <script>
 export default {
-  name: "filterTable",
-  data () {
+  name: "student",
+  data() {
     return {
-      tableData5: [{
-        date: "2016-05-02",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1518 弄",
-        tag: "家"
-      }, {
-        date: "2016-05-04",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1517 弄",
-        tag: "公司"
-      }, {
-        date: "2016-05-01",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1519 弄",
-        tag: "家"
-      }, {
-        date: "2016-05-03",
-        name: "王小虎",
-        address: "上海市普陀区金沙江路 1516 弄",
-        tag: "公司"
-      }]
+      formInline: {
+        level: "",
+        cno: "",
+      },
+      tableData: [
+        // {
+        //   id: 3,
+        //   sname: "张三",
+        //   sno: 20210101,
+        //   sex: "女",
+        //   classid: 2,
+        //   level: "2021",
+        //   cno: "3班",
+        //   headteacher: "小王",
+        // },
+        // {
+        //   id: 4,
+        //   sname: "张三23",
+        //   sno: 20210102,
+        //   sex: "女",
+        //   classid: 2,
+        //   level: "2021",
+        //   cno: "3班",
+        //   headteacher: "小王",
+        // },
+      ],
+    };
+  },
+  mounted() {
+    if (this.$route.query.level || this.$route.query.cno) {
+      this.formInline = {
+        level: this.$route.query.level,
+        cno: this.$route.query.cno,
+      };
     }
+    this.getList();
   },
   methods: {
-    handleEdit (index, row) {
-      console.log(index, row)
-      this.$message({
-        showClose: true,
-        message: index,
-        row,
-        type: "success"
-      })
+    getList() {
+      let p = { all: 1 };
+      if (this.formInline.level || this.formInline.cno) {
+        p = {
+          level: this.formInline.level,
+          cno: this.formInline.cno,
+        };
+      }
+      this.$request
+        .fetchSearchStu(p)
+        .then((res) => {
+          this.tableData = res.data.result;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    handleDelete (index, row) {
-      console.log(index, row)
-      this.$message({
-        showClose: true,
-        message: index,
-        row,
-        type: "success"
-      })
+    delete(id) {
+      this.$request
+        .fetchDelStu({ id: id })
+        .then((res) => {
+          this.getList();
+          this.$message({
+            showClose: true,
+            message: "删除成功！",
+            type: "success",
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          this.$message({
+            showClose: true,
+            message: "删除失败！",
+            type: "error",
+          });
+        });
     },
-    filterHandler (value, row, column) {
-      const property = column["property"]
-      return row[property] === value
+    onSubmit() {},
+    // handleEdit(index, row) {
+    //   console.log(index, row);
+    //   this.$message({
+    //     showClose: true,
+    //     message: index,
+    //     row,
+    //     type: "success",
+    //   });
+    // },
+    handleDelete(row) {
+      this.delete(row.id);
     },
-    formatter (row, column) {
-      return row.address
-    },
-    filterTag (value, row) {
-      return row.tag === value
-    }
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
-
+.card {
+  width: 100%;
+  padding: 20px 10px 0;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  float: right;
+}
 </style>

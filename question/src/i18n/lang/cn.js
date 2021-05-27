@@ -7,7 +7,7 @@
 import zhLocale from "element-ui/lib/locale/lang/zh-CN"
 const cn = {
   routeName: {
-    memberPermissions: "成员管理",
+    memberPermissions: "权限管理",
     studentManage: "学生管理",
     classManage: "班级管理",
 
@@ -50,9 +50,9 @@ const cn = {
     closeAll: "全部关闭"
   },
   role: {
-    superAdmin: "超级管理员",
+    superAdmin: "root",
     admin: "管理员",
-    ordinary: "普通用户"
+    ordinary: "老师"
   },
   userDropdownMenu: {
     basicInfor: "基本资料",

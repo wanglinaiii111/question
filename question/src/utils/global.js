@@ -91,7 +91,7 @@ export default {
       }
     }
 
-    /** 当res.code === 200 时
+    /** 当res.status === 200 时
      * @method $restBack
      * @param res
      * @param fn
@@ -99,7 +99,7 @@ export default {
      * @param type
      */
     Vue.prototype.$restBack = function (res, fn = () => {}, message, type = "success") {
-      if (res.code === 200) {
+      if (res.status === 200) {
         this.$message({
           message: message || res.message,
           type: type

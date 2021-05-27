@@ -10,7 +10,6 @@
         prop="rid"
         label="角色"
         :filters="[
-          { text: 'root', value: '1' },
           { text: '管理员', value: '2' },
           { text: '老师', value: '3' },
         ]"
@@ -38,7 +37,7 @@
           >
           <el-popconfirm
             title="确定删除此账号吗？"
-            @confirm="handleDelete(scope.$index, scope.row)"
+            @confirm="handleDelete(scope.row)"
           >
             <el-button slot="reference" size="mini" type="danger"
               >删除</el-button
@@ -66,7 +65,6 @@
         </el-form-item>
         <el-form-item label="角色" prop="rid">
           <el-select v-model="ruleForm.rid" placeholder="请选择角色">
-            <el-option label="root" value="1"></el-option>
             <el-option label="管理员" value="2"></el-option>
             <el-option label="老师" value="3"></el-option>
           </el-select>
@@ -94,6 +92,7 @@ export default {
       },
       dialogVisible: false,
       dialogTitle: "新建账户",
+      dialogType: "create",
       ruleForm: {
         realname: "",
         account: "",
@@ -101,48 +100,139 @@ export default {
         rid: "2",
       },
       rules: {
-        name: [{ required: true, message: "请输入用户名称", trigger: "blur" }],
         account: [
           { required: true, message: "请输入账号名称", trigger: "blur" },
         ],
         pwd: [{ required: true, message: "请输入密码", trigger: "blur" }],
       },
-      tableData5: [
-        {
-          id: "1",
-          account: "wangxiaohu123",
-          realname: "王小虎",
-          rid: "1",
-        },
-        {
-          id: "2",
-          account: "wangxiaohu456",
-          realname: "王小虎",
-          rid: "2",
-        },
-        {
-          id: "3",
-          account: "wangxiaohu789",
-          realname: "王小虎",
-          rid: "3",
-        },
-      ],
+      tableData5: [],
     };
   },
-  mounted() {},
+  mounted() {
+    this.getList();
+  },
   methods: {
-    handleDelete(index, row) {
-      this.$message({
-        showClose: true,
-        message: "删除成功！",
-        type: "success",
-      });
+    getList() {
+      let type = 0;
+      if (this.$store.getters.info.role === "admin") {
+        type = 1;
+      }
+      this.$request
+        .fetchSearchAccount({ type: type })
+        .then((res) => {
+          this.tableData5 = res.data.result;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.$message({
+            showClose: true,
+            message: "列表数据获取失败！",
+            type: "error",
+          });
+        });
+    },
+    create() {
+      this.$request
+        .fetchCreateAccount({
+          account: this.ruleForm.account,
+          pwd: this.ruleForm.pwd,
+          realname: this.ruleForm.realname,
+          rid: this.ruleForm.rid,
+        })
+        .then((res) => {
+          if (res.data.result) {
+            this.dialogVisible = false;
+            this.getList();
+            this.$message({
+              showClose: true,
+              message: "创建成功！",
+              type: "success",
+            });
+            return;
+          }
+          if (res.data.desc) {
+            this.$message({
+              showClose: true,
+              message: res.data.desc,
+              type: "error",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          this.$message({
+            showClose: true,
+            message: "创建失败！",
+            type: "error",
+          });
+        });
+    },
+    delete(id) {
+      this.$request
+        .fetchDelAccount({ id: id })
+        .then((res) => {
+          this.getList();
+          this.$message({
+            showClose: true,
+            message: "删除成功！",
+            type: "success",
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          this.$message({
+            showClose: true,
+            message: "删除失败！",
+            type: "error",
+          });
+        });
+    },
+    update() {
+      this.$request
+        .fetchUpdateAccount({
+          id: this.ruleForm.id,
+          account: this.ruleForm.account,
+          pwd: this.ruleForm.pwd,
+          realname: this.ruleForm.realname,
+          rid: this.ruleForm.rid,
+        })
+        .then((res) => {
+          if (res.data.result) {
+            this.dialogVisible = false;
+            this.getList();
+            this.$message({
+              showClose: true,
+              message: "修改成功！",
+              type: "success",
+            });
+            return;
+          }
+          if (res.data.desc) {
+            this.$message({
+              showClose: true,
+              message: res.data.desc,
+              type: "error",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          this.$message({
+            showClose: true,
+            message: "修改失败！",
+            type: "error",
+          });
+        });
+    },
+    handleDelete(row) {
+      this.delete(row.id);
     },
     filterTag(value, row) {
       return row.tag === value;
     },
     showDialog(type, row) {
       this.dialogVisible = true;
+      this.dialogType = type;
       if (type === "create") {
         this.dialogTitle = "新建账户";
         this.ruleForm = {
@@ -154,23 +244,13 @@ export default {
         return;
       }
       this.dialogTitle = "修改账户";
-      this.ruleForm = { ...row, pwd: "" };
+      this.ruleForm = { ...row, pwd: ""};
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogVisible = false;
-          this.$message({
-            showClose: true,
-            message: "创建成功！",
-            type: "success",
-          });
+          this.dialogType === "create" ? this.create() : this.update();
         } else {
-          // this.$message({
-          //   showClose: true,
-          //   message: "创建失败，请稍后重试！",
-          //   type: "error",
-          // });
           return false;
         }
       });

@@ -1,52 +1,48 @@
-import en from "../i18n/lang/en"
-import Vue from "vue"
-import Router from "vue-router"
-import CommerViews from "@/views/commerViews"
-import Login from "@/views/login/index"
-import Layout from "@/views/layout/layout"
-import HomeMain from "@/views/index/mainIndex"
+import en from "../i18n/lang/en";
+import Vue from "vue";
+import Router from "vue-router";
+import CommerViews from "@/views/commerViews";
+import Login from "@/views/login/index";
+import Layout from "@/views/layout/layout";
+import HomeMain from "@/views/index/mainIndex";
 
 // 不是必须加载的组件使用懒加载
-const Icon = () => import("@/views/icon/index")
-const Erji = () => import("@/views/duoji/erji")
-const Erji2 = () => import("@/views/duoji/erji2")
-const Sanji = () => import("@/views/duoji/sanji")
-const Sanji2 = () => import("@/views/duoji/sanji2")
-const Siji = () => import("@/views/duoji/siji")
-const Wuji = () => import("@/views/duoji/wuji")
-const Transfer = () => import("@/views/transfer/transfer")
-const DataTable = () => import("@/views/table/dataTables")
-const FilterTable = () => import("@/views/table/filterTable")
-const DragTable = () => import("@/views/table/dragTabe")
-const Upload = () => import("@/views/upload/upload")
-const Markdown = () => import("@/views/editor/markdownView")
-const WangeditorView = () => import("@/views/editor/wangeditorView")
-const NotFound = () => import("@/views/page404")
-const AddArticle = () => import("@/views/article/addArticle")
-const AddArticleEditor = () => import("@/views/article/addArticleEditor")
-const NavClassify = () => import("@/views/syssetting/navClassify")
-const pagePermissions = () => import("@/views/permissions/pagePermissions")
-const btnPermissions = () => import("@/views/permissions/btnPermissions")
+const Icon = () => import("@/views/icon/index");
+const Erji = () => import("@/views/duoji/erji");
+const Erji2 = () => import("@/views/duoji/erji2");
+const Sanji = () => import("@/views/duoji/sanji");
+const Sanji2 = () => import("@/views/duoji/sanji2");
+const Siji = () => import("@/views/duoji/siji");
+const Wuji = () => import("@/views/duoji/wuji");
+const Transfer = () => import("@/views/transfer/transfer");
+const DataTable = () => import("@/views/table/dataTables");
+const FilterTable = () => import("@/views/table/filterTable");
+const DragTable = () => import("@/views/table/dragTabe");
+const Upload = () => import("@/views/upload/upload");
+const Markdown = () => import("@/views/editor/markdownView");
+const WangeditorView = () => import("@/views/editor/wangeditorView");
+const NotFound = () => import("@/views/page404");
+const AddArticle = () => import("@/views/article/addArticle");
+const AddArticleEditor = () => import("@/views/article/addArticleEditor");
+const NavClassify = () => import("@/views/syssetting/navClassify");
+const pagePermissions = () => import("@/views/permissions/pagePermissions");
+const btnPermissions = () => import("@/views/permissions/btnPermissions");
 
-const memberPermissions = () => import("@/views/memberPermissions")
-const studentManage = () => import("@/views/studentManage")
-const classManage = () => import("@/views/classManage")
+const memberPermissions = () => import("@/views/memberPermissions");
+const studentManage = () => import("@/views/studentManage");
+const classManage = () => import("@/views/classManage");
 
 /**
  * 重写路由的push方法
  */
-const routerPush = Router.prototype.push
-Router.prototype.push = function push (location) {
-  return routerPush.call(this, location).catch(error => error)
-}
-Vue.use(Router)
-let routeName = en.routeName
+const routerPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch(error => error);
+};
+Vue.use(Router);
+let routeName = en.routeName;
 let defaultRouter = [
-  { path: "/",
-    redirect: "/index",
-    hidden: true,
-    children: []
-  },
+  { path: "/", redirect: "/index", hidden: true, children: [] },
   {
     path: "/login",
     component: Login,
@@ -77,7 +73,7 @@ let defaultRouter = [
     hidden: true,
     children: []
   }
-]
+];
 
 let addRouter = [
   {
@@ -152,7 +148,7 @@ let addRouter = [
         name: routeName.btnControl,
         component: btnPermissions,
         children: []
-      },
+      }
       // {
       //   path: "/memberPermissions",
       //   iconCls: "fa fa-user-circle-o", // 图标样式class
@@ -271,7 +267,7 @@ let addRouter = [
     iconCls: "fa fa-cloud-upload", // 图标样式class
     name: routeName.upload,
     component: Layout,
-    meta: {role: ["superAdmin"]},
+    meta: { role: ["superAdmin"] },
     children: [
       {
         path: "/upload",
@@ -287,7 +283,7 @@ let addRouter = [
     iconCls: "el-icon-edit", // 图标样式class
     name: routeName.editor,
     component: Layout,
-    meta: {role: ["superAdmin", "admin"]},
+    meta: { role: ["superAdmin", "admin"] },
     children: [
       {
         path: "/markdown",
@@ -310,7 +306,7 @@ let addRouter = [
     iconCls: "el-icon-setting", // 图标样式class
     name: routeName.systemSettings,
     component: Layout,
-    meta: {role: ["superAdmin"]},
+    meta: { role: ["superAdmin"] },
     children: [
       {
         path: "/navClassifies",
@@ -325,7 +321,7 @@ let addRouter = [
     path: "/studentManage",
     iconCls: "fa fa-id-card-o", // 图标样式class
     name: routeName.studentManage,
-    meta: {role: ["superAdmin"]},
+    meta: { role: ["superAdmin"] },
     component: Layout,
     alone: true,
     children: [
@@ -342,7 +338,7 @@ let addRouter = [
     path: "/classManage",
     iconCls: "fa fa-newspaper-o", // 图标样式class
     name: routeName.classManage,
-    meta: {role: ["superAdmin"]},
+    meta: { role: ["superAdmin"] },
     component: Layout,
     alone: true,
     children: [
@@ -359,7 +355,7 @@ let addRouter = [
     path: "/memberPermissions",
     iconCls: "fa fa-user-circle-o", // 图标样式class
     name: routeName.memberPermissions,
-    meta: {role: ["superAdmin"]},
+    meta: { role: ["superAdmin", "admin"] },
     component: Layout,
     alone: true,
     children: [
@@ -372,14 +368,9 @@ let addRouter = [
       }
     ]
   },
-  { path: "*",
-    redirect: "/404",
-    hidden: true,
-    children: []
-  }
-
-]
+  { path: "*", redirect: "/404", hidden: true, children: [] }
+];
 export default new Router({
   routes: defaultRouter
-})
-export {defaultRouter, addRouter}
+});
+export { defaultRouter, addRouter };

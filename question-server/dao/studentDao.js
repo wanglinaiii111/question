@@ -1,17 +1,9 @@
 const common = require('../common/common');
 const config = require('../common/config');
 
-async function login(param) {
-  return await common.service({
-    url: config.api_url + '/user/login/',
-    method: 'post',
-    data: param,
-  });
-}
-
 async function create(param) {
   return await common.service({
-    url: config.api_url + '/user/create/',
+    url: config.api_url + '/student/create/',
     method: 'post',
     data: param,
   });
@@ -19,7 +11,7 @@ async function create(param) {
 
 async function update(param) {
   return await common.service({
-    url: config.api_url + '/user/update/',
+    url: config.api_url + '/student/update/',
     method: 'post',
     data: param,
   });
@@ -27,24 +19,23 @@ async function update(param) {
 
 async function select(param) {
   return await common.service({
-    url: config.api_url + '/user/select/',
+    url: config.api_url + '/student/select/',
     method: 'get',
     params: param,
   });
 }
 
-async function deleteUser(param) {
+async function deleteStudent(param) {
   return await common.service({
-    url: config.api_url + '/user/delete/',
+    url: config.api_url + '/student/delete/',
     method: 'get',
     params: param,
   });
 }
 
 module.exports = {
-  login,
   create,
   select,
-  deleteUser,
+  deleteStudent,
   update,
 };
