@@ -61,5 +61,57 @@ export default {
     return axios.get(apiUrls.searchStu, {
       params: data
     });
-  }
+  },
+  //查询所有科目 GET
+  fetchSelectSubject(data) {
+    return axios.get(apiUrls.selectSubject, {
+      params: data
+    });
+  },
+  //创建考试 GET
+  fetchCreateExam(data) {
+    return axios.get(apiUrls.createExam, {
+      params: data
+    });
+  },
+  //考试查询列表 GET
+  fetchSelectExam(data) {
+    return axios.get(apiUrls.selectExam, {
+      params: data
+    });
+  },
+  //删除考试 GET
+  fetchDelExam(data) {
+    return axios.get(apiUrls.delExam, {
+      params: data
+    });
+  },
+  //创建考试科目 GET
+  fetchCreateExamsubject(data) {
+    return axios.get(apiUrls.createExamsubject, {
+      params: data
+    });
+  },
+  //查询某次考试所有考试科目 GET
+  fetchSelectExamsubject(data) {
+    return axios.get(apiUrls.selectExamsubject, {
+      params: data
+    });
+  },
+  //上传考试 班级成绩单 GET （上传的是某个班级的考试成绩表格）
+  fetchCreateGradereport(data) {
+    return axios.get(apiUrls.createGradereport, {
+      params: data
+    });
+  },
+  //查询某场考试某个科目下所有班级成绩单 GET
+  fetchSelectGradereport(data) {
+    return axios.get(apiUrls.selectGradereport, {
+      params: data
+    });
+  },
+  //文件上传接口(表单提交) POST
+  fetchExamUpload(data) {
+    return axios.post(apiUrls.examUpload, data);
+  },
 };

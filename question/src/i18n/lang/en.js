@@ -5,12 +5,15 @@
  * Description: 文件描述
  */
 
-import enLocale from "element-ui/lib/locale/lang/en"
+import enLocale from "element-ui/lib/locale/lang/en";
 const en = {
   routeName: {
     memberPermissions: "memberPermissions",
     studentManage: "studentManage",
     classManage: "classManage",
+    examManage: "examManage",
+    subjectList: "subjectList",
+    classReport: "classReport",
 
     home: "home",
     article: "article",
@@ -62,6 +65,6 @@ const en = {
   },
 
   ...enLocale //  合并element-ui内置翻译
-}
+};
 
-export default en
+export default en;

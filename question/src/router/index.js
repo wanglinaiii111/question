@@ -31,6 +31,9 @@ const btnPermissions = () => import("@/views/permissions/btnPermissions");
 const memberPermissions = () => import("@/views/memberPermissions");
 const studentManage = () => import("@/views/studentManage");
 const classManage = () => import("@/views/classManage");
+const examManage = () => import("@/views/examManage");
+const subjectList = () => import("@/views/subjectList");
+const classReport = () => import("@/views/classReport");
 
 /**
  * 重写路由的push方法
@@ -318,10 +321,26 @@ let addRouter = [
     ]
   },
   {
+    path: "/examManage",
+    iconCls: "fa fa-th-large", // 图标样式class
+    name: routeName.examManage,
+    component: Layout,
+    alone: true,
+    children: [
+      {
+        path: "/examManage",
+        iconCls: "fa fa-th-large", // 图标样式class
+        name: "examManage",
+        component: examManage,
+        children: []
+      }
+    ]
+  },
+  {
     path: "/studentManage",
     iconCls: "fa fa-id-card-o", // 图标样式class
     name: routeName.studentManage,
-    meta: { role: ["superAdmin"] },
+    meta: { role: ["superAdmin", "admin"] },
     component: Layout,
     alone: true,
     children: [
@@ -338,7 +357,7 @@ let addRouter = [
     path: "/classManage",
     iconCls: "fa fa-newspaper-o", // 图标样式class
     name: routeName.classManage,
-    meta: { role: ["superAdmin"] },
+    meta: { role: ["superAdmin", "admin"] },
     component: Layout,
     alone: true,
     children: [
@@ -364,6 +383,34 @@ let addRouter = [
         iconCls: "fa fa-user-circle-o", // 图标样式class
         name: "memberPermissions",
         component: memberPermissions,
+        children: []
+      }
+    ]
+  },
+  {
+    path: "/subjectList",
+    name: "subjectList",
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: "/subjectList",
+        name: "subjectList",
+        component: subjectList,
+        children: []
+      }
+    ]
+  },
+  {
+    path: "/classReport",
+    name: "classReport",
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: "/classReport",
+        name: "classReport",
+        component: classReport,
         children: []
       }
     ]

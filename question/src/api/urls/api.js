@@ -23,4 +23,22 @@ export default {
   delStu: "student/delete",
   //查询学生 POST
   searchStu: "student/select",
+  //查询所有科目 GET
+  selectSubject: "subject/select",
+  //创建考试 GET
+  createExam: "exam/create",
+  //考试查询列表 GET
+  selectExam: "exam/select",
+  //删除考试 GET
+  delExam: "exam/delete",
+  //创建考试科目 GET
+  createExamsubject: "exam/createExamsubject",
+  //查询某次考试所有考试科目 GET
+  selectExamsubject: "exam/select/examsubject",
+  //上传考试 班级成绩单 GET （上传的是某个班级的考试成绩表格）
+  createGradereport: "exam/create/gradereport",
+  //查询某场考试某个科目下所有班级成绩单 GET
+  selectGradereport: "exam/select/gradereport",
+  //文件上传接口(表单提交) POST
+  examUpload: "exam/file/upload",
 };

@@ -10,6 +10,9 @@ const cn = {
     memberPermissions: "权限管理",
     studentManage: "学生管理",
     classManage: "班级管理",
+    examManage: "考试管理",
+    subjectList: "科目列表",
+    classReport: "成绩单",
 
     home: "主页",
     article: "文章管理",

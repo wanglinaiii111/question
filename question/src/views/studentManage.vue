@@ -64,26 +64,6 @@ export default {
         cno: "",
       },
       tableData: [
-        // {
-        //   id: 3,
-        //   sname: "张三",
-        //   sno: 20210101,
-        //   sex: "女",
-        //   classid: 2,
-        //   level: "2021",
-        //   cno: "3班",
-        //   headteacher: "小王",
-        // },
-        // {
-        //   id: 4,
-        //   sname: "张三23",
-        //   sno: 20210102,
-        //   sex: "女",
-        //   classid: 2,
-        //   level: "2021",
-        //   cno: "3班",
-        //   headteacher: "小王",
-        // },
       ],
     };
   },
