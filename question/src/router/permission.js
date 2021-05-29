@@ -66,52 +66,43 @@ const roleMap = {
   }
 };
 router.beforeEach((to, from, next) => {
-  if (store.getters.token && store.getters.token !== "undefined") {
-    // store.dispatch('setToken', store.getters.token)
-    if (to.path === "/login") {
-      next({ path: "/" });
-    } else {
-      if (!store.getters.info) {
-        let user = store.getters.token;
-        if (typeof user === "string") {
-          user = JSON.parse(store.getters.token);
-        }
-
-        (async function getAddRouters() {
-          api
-            .fetchLogin({
-              account: user.username,
-              pwd: user.password
-            })
-            .then(async function(res) {
-              await store.dispatch("getInfo", roleMap[res.data.data.rid]);
-              await store.dispatch("newRoutes", store.getters.info.role);
-              await router.addRoutes(store.getters.addRouters);
-              next({ path: "/index" });
-            })
-            .catch(function(error) {
-              console.log(error);
-            });
-        })();
-      } else {
-        let is404 = to.matched.some(record => {
-          console.log(record);
-          if (record.meta.role) {
-            return store.getters.info.role === -1;
-          }
-        });
-        if (is404) {
-          next({ path: "/404" });
-          return false;
-        }
-        next();
-      }
-    }
+  // store.dispatch('setToken', store.getters.token)
+  if (to.path === "/login") {
+    next();
   } else {
-    if (to.path === "/login") {
+    if (!store.getters.info) {
+      (async function getAddRouters() {
+        api
+          .fetchUser({})
+          .then(async function(res) {
+            console.log(res);
+            if (!res.data.user) {
+              next({ path: "/login" });
+              return;
+            }
+            await store.dispatch("getInfo", roleMap[res.data.user.rid]);
+            await store.dispatch("newRoutes", store.getters.info.role);
+            await router.addRoutes(store.getters.addRouters);
+            next({ path: "/index" });
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      })();
+    } else {
+      // todo 访问无权访问的菜单，跳转404
+      let is404 = to.matched.some(record => {
+        console.log(record);
+        if (record.meta.role) {
+          return store.getters.info.role === -1;
+        }
+      });
+      if (is404) {
+        next({ path: "/404" });
+        return false;
+      }
       next();
     }
-    next({ path: "/login" });
   }
 });
 

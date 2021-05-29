@@ -8,7 +8,7 @@
       </div>
       <div class="loginBox">
         <div class="loginCon">
-          <!-- <p class="title">学生管理系统</p> -->
+          <p class="title">学生管理系统</p>
           <el-card shadow="always" class="login-module" v-if="smdl">
             <div slot="header" class="clearfix formTitlt">
               <span>密码登录</span>
@@ -85,8 +85,8 @@ export default {
       smdl: true,
       loginForm: {
         username: "root",
-        password: "root",
-      },
+        password: "root"
+      }
     };
   },
   methods: {
@@ -96,7 +96,7 @@ export default {
         this.$message({
           showClose: true,
           message: "账号或密码不能为空",
-          type: "error",
+          type: "error"
         });
         return false;
       } else {
@@ -104,55 +104,33 @@ export default {
         this.$request
           .fetchLogin({
             account: that.loginForm.username,
-            pwd: that.loginForm.password,
+            pwd: that.loginForm.password
           })
-          .then((res) => {
+          .then(res => {
+            if (res.data.err) {
+              this.$message({
+                showClose: true,
+                message: res.data.err,
+                type: "error"
+              });
+              return;
+            }
             that.$restBack(
               res,
               () => {
-                that.$store
-                  .dispatch("setToken", {
-                    username: that.loginForm.username,
-                    password: that.loginForm.password,
-                  })
-                  .then(() => {
-                    that.$router.push({ path: "/" });
-                  });
+                that.$router.push({ path: "/" });
               },
               "登录成功"
             );
           })
-          .catch((err) => {
+          .catch(err => {
             console.log(err);
           });
-
-        // 将 username 设置为 token 存储在 store，仅为测试效果，实际存储 token 以后台返回为准
-        // that.$store
-        //   .dispatch("setToken", that.loginForm.username)
-        //   .then(() => {
-        //     that.$router.push({ path: "/" });
-        //   })
-        //   .catch((res) => {
-        //     that.$message({
-        //       showClose: true,
-        //       message: res,
-        //       type: "error",
-        //     });
-        //   });
       }
-    },
-    // message () {
-    //   const h = this.$createElement
-    //   this.$notify({
-    //     title: "账号密码",
-    //     message: h("i", {style: "color: teal"}, "账号密码可以随意填写，为了测试效果填写的账号将会被存储为临时假 token"),
-    //     duration: 6000
-    //   })
-    // }
+    }
   },
   mounted() {
-    // this.message()
-  },
+  }
 };
 </script>
 <style lang="scss">

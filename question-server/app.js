@@ -210,10 +210,6 @@ const ignoreList = ['.exe', '.rar', '.docx', '.pptx', '/user/login', '/user/logo
 app.use(function (req, res, next) {
   console.log(req.session.userId);
 
-  //ceshi
-  next();
-  return;
-
   if (!req.session.userId) {
     let ignore = false;
     let url = req.originalUrl;

@@ -1,6 +1,8 @@
 export default {
   // 登录post
   login: "user/login",
+  fetchUser: "user/userInfo",
+  fetchLoginOut: "user/loginOut",
   // 创建账号post
   createAccount: "user/create",
   // 删除账号get

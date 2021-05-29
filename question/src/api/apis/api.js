@@ -6,6 +6,12 @@ export default {
   fetchLogin(data) {
     return axios.post(apiUrls.login, data);
   },
+  fetchUser(data) {
+    return axios.get(apiUrls.fetchUser, data);
+  },
+  fetchLoginOut(data) {
+    return axios.get(apiUrls.fetchLoginOut, data);
+  },
   // 创建账号post
   fetchCreateAccount(data) {
     return axios.post(apiUrls.createAccount, data);
@@ -113,5 +119,5 @@ export default {
   //文件上传接口(表单提交) POST
   fetchExamUpload(data) {
     return axios.post(apiUrls.examUpload, data);
-  },
+  }
 };
