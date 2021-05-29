@@ -3,7 +3,7 @@
     <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px" class="demo-dynamic">
       <el-form-item
         prop="indexName"
-        label="首页"
+        label="首页1"
         :rules="{
       required: true, message: '分类不能为空', trigger: 'blur'
     }"
@@ -36,7 +36,7 @@ export default {
     return {
       dynamicValidateForm: {
         domains: [],
-        indexName: "首页",
+        indexName: "首页1",
         indexHref: "/index"
       }
     }

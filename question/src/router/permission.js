@@ -62,7 +62,7 @@ const roleMap = {
   },
   3: {
     role: "ordinary",
-    permissions: "老师"
+    permissions: "教师"
   }
 };
 router.beforeEach((to, from, next) => {
@@ -80,10 +80,10 @@ router.beforeEach((to, from, next) => {
               next({ path: "/login" });
               return;
             }
-            await store.dispatch("getInfo", roleMap[res.data.user.rid]);
+            await store.dispatch("getInfo", {...roleMap[res.data.user.rid],account:res.data.user.account});
             await store.dispatch("newRoutes", store.getters.info.role);
             await router.addRoutes(store.getters.addRouters);
-            next({ path: "/index" });
+            next({ path: "/examManage" });
           })
           .catch(function(error) {
             console.log(error);
@@ -92,7 +92,6 @@ router.beforeEach((to, from, next) => {
     } else {
       // todo 访问无权访问的菜单，跳转404
       let is404 = to.matched.some(record => {
-        console.log(record);
         if (record.meta.role) {
           return store.getters.info.role === -1;
         }

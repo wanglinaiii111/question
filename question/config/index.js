@@ -21,15 +21,15 @@ module.exports = {
   dev: {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable:  devEnv.PROXY_REQUEST === false ? {} :{
-      '/api': {
-        target: 'http://localhost:8002',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/api': '/'
-        }
-      }
-    },
+    // proxyTable:  devEnv.PROXY_REQUEST === false ? {} :{
+    //   '/api': {
+    //     target: 'http://localhost:8002',
+    //     changeOrigin: true,
+    //     pathRewrite: {
+    //       '^/api': '/'
+    //     }
+    //   }
+    // },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
@@ -63,11 +63,13 @@ module.exports = {
   },
 
   build: {
+    host: 'localhost', // can be overwritten by process.env.HOST
+    port: 8002,
     // Template for index.html
-    index: path.resolve(__dirname, `../dist/${version}/index.html`),
+    index: path.resolve(__dirname, `../../question-server/views/${version}/index.html`),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, `../dist/${version}`),
+    assetsRoot: path.resolve(__dirname, `../../question-server/public/${version}`),
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
 

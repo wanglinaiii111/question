@@ -18,22 +18,21 @@
         <li>
           <el-dropdown @command="handleCommand">
             <span class="el-dropdown-link">
-              夏洛克丶旭<i class="el-icon-arrow-down el-icon--right"></i>
+              {{ this.$store.getters.info.account
+              }}<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="info">{{
+              <!-- <el-dropdown-item command="info">{{
                 $t("userDropdownMenu.basicInfor")
               }}</el-dropdown-item>
               <el-dropdown-item command="editPassword">{{
                 $t("userDropdownMenu.changePassword")
-              }}</el-dropdown-item>
-              <el-dropdown-item command="logout" divided>{{
-                $t("userDropdownMenu.logout")
-              }}</el-dropdown-item>
+              }}</el-dropdown-item> -->
+              <el-dropdown-item command="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </li>
-        <li class="icon"><img :src="avatar" /></li>
+        <!-- <li class="icon"><img :src="avatar" /></li> -->
       </ul>
     </el-header>
     <tabNav></tabNav>
@@ -126,6 +125,7 @@ export default {
               });
               return;
             }
+            sessionStorage.clear()
             location.reload();
           })
           .catch(err => {

@@ -27,7 +27,7 @@ async function deleteExam(param) {
 
 async function createExamSubject(param) {
   return await common.service({
-    url: config.api_url + 'exam/create/examsubject',
+    url: config.api_url + '/exam/create/examsubject',
     method: 'get',
     params: param,
   });

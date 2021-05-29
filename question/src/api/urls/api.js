@@ -1,4 +1,6 @@
-export default {
+let url = "http://localhost:8002/";
+
+let api = {
   // 登录post
   login: "user/login",
   fetchUser: "user/userInfo",
@@ -42,5 +44,9 @@ export default {
   //查询某场考试某个科目下所有班级成绩单 GET
   selectGradereport: "exam/select/gradereport",
   //文件上传接口(表单提交) POST
-  examUpload: "exam/file/upload",
+  examUpload: "exam/file/upload"
 };
+for (const key in api) {
+  api[key] = url + api[key];
+}
+export default api;

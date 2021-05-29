@@ -2,8 +2,8 @@
   <div>
     <el-aside id="asideNav">
       <div class="logo-name">
-        <p v-if="$store.getters.logoShow">XU</p>
-        <p v-else>管理系统</p>
+        <p v-if="$store.getters.logoShow">题库</p>
+        <p v-else>题库管理系统</p>
       </div>
       <el-menu :default-active="$route.path" class="el-menu-vertical"
                @select="selectmenu"
@@ -68,6 +68,7 @@ export default {
         }
         return name
       }
+      
       this.$store.dispatch("addTab", {
         title: navTitle(key, router),
         path: key

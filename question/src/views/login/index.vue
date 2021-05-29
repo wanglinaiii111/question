@@ -84,8 +84,8 @@ export default {
     return {
       smdl: true,
       loginForm: {
-        username: "root",
-        password: "root"
+        username: "",
+        password: ""
       }
     };
   },
@@ -129,8 +129,7 @@ export default {
       }
     }
   },
-  mounted() {
-  }
+  mounted() {}
 };
 </script>
 <style lang="scss">

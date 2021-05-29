@@ -2,7 +2,7 @@
   <div>
     <template>
       <div class="card">
-        <h1>「{{ exam_name }}」「{{ subject_name }}」成绩单</h1>
+        <h1>考试名称:{{ exam_name }} 科目名称:{{ subject_name }} 成绩单</h1>
       </div>
       <el-table :data="tableData">
         <el-table-column property="level" label="年级"></el-table-column>

@@ -98,7 +98,7 @@ export default {
       this.$request
         .fetchSelectExamsubject({ exam_id: this.exam_id })
         .then((res) => {
-          this.curSubjectList = res.data.result;
+          this.curSubjectList = res.data;
         })
         .catch((error) => {
           console.log(error);
@@ -123,7 +123,7 @@ export default {
         .fetchCreateExamsubject(this.formAddSub)
         .then((res) => {
           if (res.data.result) {
-            this.dialogVisible = false;
+            this.dialogSubVisible = false;
             this.getList();
             this.$message({
               showClose: true,

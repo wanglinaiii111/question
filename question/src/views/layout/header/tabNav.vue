@@ -27,6 +27,9 @@ export default {
       top: 0
     }
   },
+  mounted(){
+    console.log(this.$store.getters.tabnavBox)
+  },
   methods: {
     openMenu (item, e, index) {
       if (index === 0) {

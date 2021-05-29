@@ -43,7 +43,7 @@
         <el-table-column prop="level" label="年级" sortable> </el-table-column>
         <el-table-column prop="cno" label="班号"> </el-table-column>
         <el-table-column prop="headteacher" label="班主任"> </el-table-column>
-        <el-table-column label="操作" width="250px">
+        <el-table-column label="操作" width="400px">
           <template slot-scope="scope">
             <el-button size="mini" @click="addStudentBtn(scope.row)"
               >添加学生</el-button
@@ -113,8 +113,16 @@
         <el-form-item label="学号" placeholder="请输入学生学号">
           <el-input v-model="stuForm.sno"></el-input>
         </el-form-item>
-        <el-form-item label="性别" placeholder="请输入学生性别">
-          <el-input v-model="stuForm.sex"></el-input>
+        <el-form-item label="性别">
+          <el-select
+            v-model="stuForm.sex"
+            size="medium"
+            placeholder="请选择性别"
+            filterable
+          >
+            <el-option label="男" value="男"></el-option>
+            <el-option label="女" value="女"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -137,20 +145,20 @@ export default {
       stuForm: {
         sname: "",
         sno: "",
-        sex: "",
+        sex: "男"
       },
       ruleForm: {
         level: [],
         cno: "",
-        headteacher: "",
+        headteacher: ""
       },
       formInline: {
         level: "",
-        teacher: "",
+        teacher: ""
       },
       tableData: [],
       teacherList: [],
-      classId: null,
+      classId: null
     };
   },
   mounted() {
@@ -161,33 +169,34 @@ export default {
     getTeacherList() {
       this.$request
         .fetchSearchAccount({ type: 1 })
-        .then((res) => {
+        .then(res => {
           this.teacherList = res.data.result;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "老师数据获取失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
+
     getList() {
       this.$request
         .fetchSearchClass({
           level: this.formInline.level,
-          headteacher: this.formInline.teacher,
+          headteacher: this.formInline.teacher
         })
-        .then((res) => {
+        .then(res => {
           this.tableData = res.data.result;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "列表数据获取失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
@@ -196,16 +205,16 @@ export default {
         .fetchCreateClass({
           level: this.ruleForm.level,
           cno: this.ruleForm.cno,
-          headteacher: this.ruleForm.headteacher,
+          headteacher: this.ruleForm.headteacher
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.result) {
             this.dialogVisible = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "创建成功！",
-              type: "success",
+              type: "success"
             });
             return;
           }
@@ -213,36 +222,36 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error",
+              type: "error"
             });
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "创建失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
     delete(id) {
       this.$request
         .fetchDelClass({ id: id })
-        .then((res) => {
+        .then(res => {
           this.getList();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success",
+            type: "success"
           });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "删除失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
@@ -250,16 +259,16 @@ export default {
       this.$request
         .fetchUpdateClass({
           id: this.ruleForm.id,
-          headteacher: this.ruleForm.headteacher,
+          headteacher: this.ruleForm.headteacher
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.result) {
             this.dialogVisible = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "修改成功！",
-              type: "success",
+              type: "success"
             });
             return;
           }
@@ -267,16 +276,16 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error",
+              type: "error"
             });
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "修改失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
@@ -285,8 +294,8 @@ export default {
         path: "/studentManage",
         query: {
           level: data.level,
-          cno: data.cno,
-        },
+          cno: data.cno
+        }
       });
     },
     showDialog(type, row) {
@@ -297,7 +306,7 @@ export default {
         this.ruleForm = {
           level: [],
           cno: "",
-          headteacher: "",
+          headteacher: ""
         };
         return;
       }
@@ -324,15 +333,15 @@ export default {
           sname: this.stuForm.sname,
           sno: this.stuForm.sno,
           sex: this.stuForm.sex,
-          classid: this.classId,
+          classid: this.classId
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.result) {
             this.dialogAddStu = false;
             this.$message({
               showClose: true,
               message: "添加成功！",
-              type: "success",
+              type: "success"
             });
             return;
           }
@@ -340,20 +349,20 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error",
+              type: "error"
             });
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "添加失败！",
-            type: "error",
+            type: "error"
           });
         });
-    },
-  },
+    }
+  }
 };
 </script>
 

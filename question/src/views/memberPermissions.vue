@@ -11,7 +11,7 @@
         label="角色"
         :filters="[
           { text: '管理员', value: '2' },
-          { text: '老师', value: '3' },
+          { text: '教师', value: '3' }
         ]"
         :filter-method="filterTag"
         filter-placement="bottom-end"
@@ -58,15 +58,22 @@
           <el-input v-model="ruleForm.realname"></el-input>
         </el-form-item>
         <el-form-item label="账号名" prop="account">
-          <el-input v-model="ruleForm.account"></el-input>
+          <el-input
+            v-model="ruleForm.account"
+            :disabled="dialogType === 'edit'"
+          ></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="pwd">
           <el-input v-model="ruleForm.pwd"></el-input>
         </el-form-item>
         <el-form-item label="角色" prop="rid">
           <el-select v-model="ruleForm.rid" placeholder="请选择角色">
-            <el-option label="管理员" value="2"></el-option>
-            <el-option label="老师" value="3"></el-option>
+            <el-option
+              label="管理员"
+              value="2"
+              v-if="$store.getters.info.role === 'superAdmin'"
+            ></el-option>
+            <el-option label="教师" value="3"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -88,7 +95,7 @@ export default {
       roleMap: {
         1: "root",
         2: "管理员",
-        3: "老师",
+        3: "教师"
       },
       dialogVisible: false,
       dialogTitle: "新建账户",
@@ -97,15 +104,15 @@ export default {
         realname: "",
         account: "",
         pwd: "",
-        rid: "2",
+        rid: "3"
       },
       rules: {
         account: [
-          { required: true, message: "请输入账号名称", trigger: "blur" },
+          { required: true, message: "请输入账号名称", trigger: "blur" }
         ],
-        pwd: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        pwd: [{ required: true, message: "请输入密码", trigger: "blur" }]
       },
-      tableData5: [],
+      tableData5: []
     };
   },
   mounted() {
@@ -119,15 +126,15 @@ export default {
       }
       this.$request
         .fetchSearchAccount({ type: type })
-        .then((res) => {
+        .then(res => {
           this.tableData5 = res.data.result;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "列表数据获取失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
@@ -137,16 +144,16 @@ export default {
           account: this.ruleForm.account,
           pwd: this.ruleForm.pwd,
           realname: this.ruleForm.realname,
-          rid: this.ruleForm.rid,
+          rid: this.ruleForm.rid
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.result) {
             this.dialogVisible = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "创建成功！",
-              type: "success",
+              type: "success"
             });
             return;
           }
@@ -154,36 +161,36 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error",
+              type: "error"
             });
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "创建失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
     delete(id) {
       this.$request
         .fetchDelAccount({ id: id })
-        .then((res) => {
+        .then(res => {
           this.getList();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success",
+            type: "success"
           });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "删除失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
@@ -194,16 +201,16 @@ export default {
           account: this.ruleForm.account,
           pwd: this.ruleForm.pwd,
           realname: this.ruleForm.realname,
-          rid: this.ruleForm.rid,
+          rid: this.ruleForm.rid
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.result) {
             this.dialogVisible = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "修改成功！",
-              type: "success",
+              type: "success"
             });
             return;
           }
@@ -211,16 +218,16 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error",
+              type: "error"
             });
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "修改失败！",
-            type: "error",
+            type: "error"
           });
         });
     },
@@ -239,23 +246,23 @@ export default {
           realname: "",
           account: "",
           pwd: "",
-          rid: "2",
+          rid: "3"
         };
         return;
       }
       this.dialogTitle = "修改账户";
-      this.ruleForm = { ...row, pwd: ""};
+      this.ruleForm = { ...row, pwd: "" };
     },
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(valid => {
         if (valid) {
           this.dialogType === "create" ? this.create() : this.update();
         } else {
           return false;
         }
       });
-    },
-  },
+    }
+  }
 };
 </script>
 
