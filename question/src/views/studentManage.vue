@@ -204,7 +204,9 @@ export default {
           });
         });
     },
-    onSubmit() {},
+    onSubmit() {
+      this.getList();
+    },
     // handleEdit(index, row) {
     //   console.log(index, row);
     //   this.$message({

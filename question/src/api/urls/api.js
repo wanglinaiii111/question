@@ -1,4 +1,5 @@
 let url = "http://localhost:8002/";
+url = "./"; // 打包时配置
 
 let api = {
   // 登录post

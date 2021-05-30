@@ -1,2 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[22],{"XYp+":function(n,e,t){"use strict";t.r(e);var i={name:"erji"},s=t("KHd+"),r=Object(s.a)(i,(function(){var n=this.$createElement;return(this._self._c||n)("div",[this._v("\n  无限级菜单测试======二级2222页面\n")])}),[],!1,null,"11f41d60",null);e.default=r.exports}}]);
-//# sourceMappingURL=22.d199fa9f64ed4f79f6c2.js.map

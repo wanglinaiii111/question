@@ -1,1 +1,0 @@
-{"version":3,"sources":["app.47de4ba1fe24.css"],"names":[],"mappings":"AACA,yBACE,WAAY,CACZ,kBACF","file":"app.47de4ba1fe24.css","sourcesContent":["\n.addBtn[data-v-03c38c91] {\r\n  float: right;\r\n  margin-bottom: 20px;\n}\r\n\n"]}

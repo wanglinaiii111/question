@@ -118,6 +118,7 @@ export default {
   },
   //文件上传接口(表单提交) POST
   fetchExamUpload(data) {
+    console.log('123');
     return axios.post(apiUrls.examUpload, data);
   }
 };

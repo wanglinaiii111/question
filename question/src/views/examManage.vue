@@ -18,9 +18,9 @@
         ></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button size="mini" @click="createSubject(scope.row)"
+            <!-- <el-button size="mini" @click="createSubject(scope.row)"
               >添加科目</el-button
-            >
+            > -->
             <el-button size="mini" @click="showSubject(scope.row)"
               >查看科目</el-button
             >
@@ -65,7 +65,7 @@
         <el-button type="primary" @click="create">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="添加科目" :visible.sync="dialogSubVisible" width="357px">
+    <!-- <el-dialog title="添加科目" :visible.sync="dialogSubVisible" width="357px">
       <el-form :model="formAddSub" label-width="100px">
         <el-form-item label="考试科目">
           <el-select
@@ -73,6 +73,7 @@
             size="medium"
             placeholder="请选择考试科目"
             filterable
+            @change="changeSubject"
           >
             <el-option
               v-for="item in allSubjectList"
@@ -82,24 +83,36 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="试卷存储路径">
-          <el-input
-            v-model="formAddSub.question_file_path"
-            size="medium"
-          ></el-input>
+        <el-form-item label="上传试卷">
+          <el-upload
+            action=""
+            :with-credentials="true"
+            :limit="1"
+            :file-list="fileList"
+            :http-request="param => upload(param, 'questions')"
+            :on-exceed="() => handleExceed('试卷')"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
         </el-form-item>
-        <el-form-item label="答案存储路径">
-          <el-input
-            v-model="formAddSub.answer_file_path"
-            size="medium"
-          ></el-input>
+        <el-form-item label="上传答案">
+          <el-upload
+            action=""
+            :with-credentials="true"
+            :limit="1"
+            :file-list="answersFileList"
+            :http-request="param => upload(param, 'answers')"
+            :on-exceed="() => handleExceed('答案')"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogSubVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitAddSubject">确 定</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -113,15 +126,19 @@ export default {
       ruleForm: {
         name: "",
         start_time: "",
-        end_time: "",
+        end_time: ""
       },
       formAddSub: {
-        subject_id: "",
+        subject_id: "1",
         question_file_path: "",
-        answer_file_path: "",
+        answer_file_path: ""
       },
       tableData: [],
       allSubjectList: [],
+      // fileList: [],
+      // answersFileList: [],
+      // fileName: "",
+      // answersFileName: ""
     };
   },
   mounted() {
@@ -129,23 +146,42 @@ export default {
     this.getSubjectList();
   },
   methods: {
+    // upload(param, type) {
+    //   const fileType = param.file.name.split(".").pop();
+    //   const filename = `${this.formAddSub.exam_id}_${this.formAddSub.subject_id}_${type}.${fileType}`;
+    //   if (type === "questions") {
+    //     this.fileName = filename;
+    //   } else {
+    //     this.answersFileName = filename;
+    //   }
+    //   let formData = new FormData();
+    //   formData.append("files", param.file);
+    //   formData.append("filename", filename);
+    //   console.log(formData);
+    //   this.$request.fetchExamUpload(formData).then(res => {
+    //     // console.log(res);
+    //     if (res.IsSuccess) {
+    //       this.imgList.push(res.Data.Data);
+    //     }
+    //   });
+    // },
     getList() {
       this.$request
         .fetchSelectExam({})
-        .then((res) => {
+        .then(res => {
           this.tableData = res.data.result;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
     getSubjectList() {
       this.$request
         .fetchSelectSubject({})
-        .then((res) => {
+        .then(res => {
           this.allSubjectList = res.data;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -154,16 +190,16 @@ export default {
         .fetchCreateExam({
           name: this.ruleForm.name,
           start_time: this.ruleForm.start_time,
-          end_time: this.ruleForm.end_time,
+          end_time: this.ruleForm.end_time
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.result) {
             this.dialogVisible = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "创建成功！",
-              type: "success",
+              type: "success"
             });
             return;
           }
@@ -171,26 +207,26 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error",
+              type: "error"
             });
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
     delete(id) {
       this.$request
         .fetchDelExam({ exam_id: id })
-        .then((res) => {
+        .then(res => {
           this.getList();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success",
+            type: "success"
           });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -201,42 +237,61 @@ export default {
       this.dialogSubVisible = true;
       this.formAddSub = { ...this.formAddSub, exam_id: row.exam_id };
     },
-    submitAddSubject() {
-      this.$request
-        .fetchCreateExamsubject(this.formAddSub)
-        .then((res) => {
-          if (res.data.result) {
-            this.dialogVisible = false;
-            this.getList();
-            this.$message({
-              showClose: true,
-              message: "创建成功！",
-              type: "success",
-            });
-            return;
-          }
-          if (res.data.desc) {
-            this.$message({
-              showClose: true,
-              message: res.data.desc,
-              type: "error",
-            });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
+    // submitAddSubject() {
+    //   if(!this.fileName){
+    //     this.$message.error(`试卷未上传，请上传试卷`);
+    //     return
+    //   }
+    //   if(!this.answersFileName){
+    //     this.$message.error(`答案未上传，请上传答案`);
+    //     return
+    //   }
+    //   this.$request
+    //     .fetchCreateExamsubject({
+    //       ...this.formAddSub,
+    //       question_file_path: this.fileName,
+    //       answer_file_path: this.answersFileName
+    //     })
+    //     .then(res => {
+    //       if (res.data.result) {
+    //         this.dialogSubVisible = false;
+    //         this.getList();
+    //         this.$message({
+    //           showClose: true,
+    //           message: "创建成功！",
+    //           type: "success"
+    //         });
+    //         return;
+    //       }
+    //       if (res.data.desc) {
+    //         this.$message({
+    //           showClose: true,
+    //           message: res.data.desc,
+    //           type: "error"
+    //         });
+    //       }
+    //     })
+    //     .catch(error => {
+    //       console.log(error);
+    //     });
+    // },
     showSubject(row) {
       this.$router.push({
         path: "/subjectList",
         query: {
           exam_id: row.exam_id,
-          exam_name: row.name,
-        },
+          exam_name: row.name
+        }
       });
     },
-  },
+    handleExceed(type) {
+      this.$message.warning(`您已上传${type}，请将已上传的文件删除后重新上传`);
+    },
+    changeSubject() {
+      this.fileList = [];
+      this.answersFileList = [];
+    }
+  }
 };
 </script>
 
