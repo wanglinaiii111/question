@@ -16,7 +16,8 @@ export default {
         title: "examManage",
         path: "/examManage"
       }
-    ]
+    ],
+    examLevel: "exam"
   },
   mutations: {
     addTab(state, arg) {
@@ -84,6 +85,9 @@ export default {
       } else {
         state.logoShow = true;
       }
+    },
+    setExamLevel(state, type) {
+      state.examLevel = type;
     }
   },
   actions: {
@@ -101,6 +105,9 @@ export default {
     },
     collapse({ commit }, arg) {
       commit("collapse", arg);
+    },
+    setExamLevel({ commit }, type) {
+      commit("setExamLevel", type);
     }
   }
 };

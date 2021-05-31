@@ -1,6 +1,7 @@
 <template>
   <div>
     <template>
+      <el-button size="medium" @click="back">返回上一级</el-button>
       <el-button class="addBtn" size="medium" @click="createSubject"
         >添加科目</el-button
       >
@@ -56,7 +57,7 @@
             :with-credentials="true"
             :limit="1"
             :file-list="fileList"
-            :http-request="param => upload(param, 'questions')"
+            :http-request="(param) => upload(param, 'questions')"
             :on-exceed="() => handleExceed('试卷')"
           >
             <el-button size="small" type="primary">点击上传</el-button>
@@ -71,7 +72,7 @@
             :with-credentials="true"
             :limit="1"
             :file-list="answersFileList"
-            :http-request="param => upload(param, 'answers')"
+            :http-request="(param) => upload(param, 'answers')"
             :on-exceed="() => handleExceed('答案')"
           >
             <el-button size="small" type="primary">点击上传</el-button>
@@ -118,7 +119,8 @@
 
 <script>
 export default {
-  name: "student",
+  name: "subject",
+  props: ["param"],
   data() {
     return {
       dialogSubVisible: false,
@@ -126,7 +128,7 @@ export default {
       formAddSub: {
         subject_id: "1",
         question_file_path: "",
-        answer_file_path: ""
+        answer_file_path: "",
       },
       allSubjectList: [],
       curSubjectList: [],
@@ -145,8 +147,8 @@ export default {
     };
   },
   mounted() {
-    this.exam_id = this.$route.query.exam_id || "";
-    this.exam_name = this.$route.query.exam_name || "";
+    this.exam_id = this.param.exam_id || "";
+    this.exam_name = this.param.exam_name || "";
     this.getList();
     this.getSubjectList();
     // this.getClassList();
@@ -166,7 +168,7 @@ export default {
       formData.append("files", param.file);
       formData.append("filename", filename);
       console.log(formData);
-      this.$request.fetchExamUpload(formData).then(res => {
+      this.$request.fetchExamUpload(formData).then((res) => {
         // console.log(res);
         if (res.IsSuccess) {
           this.imgList.push(res.Data.Data);
@@ -176,10 +178,10 @@ export default {
     getList() {
       this.$request
         .fetchSelectExamsubject({ exam_id: this.exam_id })
-        .then(res => {
+        .then((res) => {
           this.curSubjectList = res.data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -222,15 +224,17 @@ export default {
     getSubjectList() {
       this.$request
         .fetchSelectSubject({})
-        .then(res => {
+        .then((res) => {
           this.allSubjectList = res.data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
     createSubject() {
       this.dialogSubVisible = true;
+      this.fileList = [];
+      this.answersFileList = [];
       this.formAddSub = { ...this.formAddSub, exam_id: this.exam_id };
     },
     submitAddSubject() {
@@ -246,16 +250,16 @@ export default {
         .fetchCreateExamsubject({
           ...this.formAddSub,
           question_file_path: this.fileName,
-          answer_file_path: this.answersFileName
+          answer_file_path: this.answersFileName,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.result) {
             this.dialogSubVisible = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "上传成功！",
-              type: "success"
+              type: "success",
             });
             return;
           }
@@ -263,11 +267,11 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error"
+              type: "error",
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -315,16 +319,24 @@ export default {
     //     });
     // },
     showReport(row) {
-      this.$router.push({
-        path: "/classReport",
-        query: {
-          exam_detail_id: row.exam_detail_id,
-          subject_name: row.subject_name,
-          exam_name: this.exam_name,
-          exam_id: row.exam_id,
-          subject_id: row.subject_id
-        }
+      // this.$router.push({
+      //   path: "/classReport",
+      //   query: {
+      //     exam_detail_id: row.exam_detail_id,
+      //     subject_name: row.subject_name,
+      //     exam_name: this.exam_name,
+      //     exam_id: row.exam_id,
+      //     subject_id: row.subject_id,
+      //   },
+      // });
+      this.$emit("func", {
+        exam_detail_id: row.exam_detail_id,
+        subject_name: row.subject_name,
+        exam_name: this.exam_name,
+        exam_id: row.exam_id,
+        subject_id: row.subject_id,
       });
+      this.$store.dispatch("setExamLevel", "grade");
     },
     handleExceed(type) {
       this.$message.warning(`您已上传${type}，请将已上传的文件删除后重新上传`);
@@ -336,7 +348,10 @@ export default {
     // handleChange(value) {
     //   this.gradeForm.class = value[1];
     // }
-  }
+    back() {
+      this.$store.dispatch("setExamLevel", "exam");
+    },
+  },
 };
 </script>
 

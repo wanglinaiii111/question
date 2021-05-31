@@ -80,7 +80,10 @@ router.beforeEach((to, from, next) => {
               next({ path: "/login" });
               return;
             }
-            await store.dispatch("getInfo", {...roleMap[res.data.user.rid],account:res.data.user.account});
+            await store.dispatch("getInfo", {
+              ...roleMap[res.data.user.rid],
+              account: res.data.user.account
+            });
             await store.dispatch("newRoutes", store.getters.info.role);
             await router.addRoutes(store.getters.addRouters);
             next({ path: "/examManage" });
@@ -108,3 +111,4 @@ router.beforeEach((to, from, next) => {
 router.afterEach(() => {
   NProgress.done();
 });
+

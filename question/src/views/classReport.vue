@@ -1,5 +1,6 @@
 <template>
   <div>
+    <el-button size="medium" @click="back">返回上一级</el-button>
     <el-button class="addBtn" size="medium" @click="clickUpload"
       >上传成绩单</el-button
     >
@@ -47,7 +48,7 @@
             :with-credentials="true"
             :limit="1"
             :file-list="gradeFileList"
-            :http-request="param => upload(param, 'grade')"
+            :http-request="(param) => upload(param, 'grade')"
             :on-exceed="() => handleExceed('成绩单')"
           >
             <el-button size="small" type="primary">上传成绩单</el-button>
@@ -65,6 +66,7 @@
 <script>
 export default {
   name: "student",
+  props: ["param"],
   data() {
     return {
       dialogGrade: false,
@@ -77,18 +79,18 @@ export default {
       gradeFileList: [],
       gradeFileName: "",
       gradeForm: {
-        class: ""
+        class: "",
       },
       options: [],
-      classMap: {}
+      classMap: {},
     };
   },
   mounted() {
-    this.subject_name = this.$route.query.subject_name || "";
-    this.exam_name = this.$route.query.exam_name || "";
-    this.exam_detail_id = this.$route.query.exam_detail_id || "";
-    this.exam_id = this.$route.query.exam_id || "";
-    this.subject_id = this.$route.query.subject_id || "";
+    this.subject_name = this.param.subject_name || "";
+    this.exam_name = this.param.exam_name || "";
+    this.exam_detail_id = this.param.exam_detail_id || "";
+    this.exam_id = this.param.exam_id || "";
+    this.subject_id = this.param.subject_id || "";
 
     this.getList();
     this.getClassList();
@@ -97,10 +99,10 @@ export default {
     getList() {
       this.$request
         .fetchSelectGradereport({ exam_detail_id: this.exam_detail_id })
-        .then(res => {
+        .then((res) => {
           this.tableData = res.data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -117,7 +119,7 @@ export default {
       let formData = new FormData();
       formData.append("files", param.file);
       formData.append("filename", filename);
-      this.$request.fetchExamUpload(formData).then(res => {
+      this.$request.fetchExamUpload(formData).then((res) => {
         // console.log(res);
         if (res.IsSuccess) {
           this.imgList.push(res.Data.Data);
@@ -128,36 +130,36 @@ export default {
       this.$request
         .fetchSearchClass({
           level: "",
-          headteacher: ""
+          headteacher: "",
         })
-        .then(res => {
+        .then((res) => {
           const result = res.data.result;
           let data = [];
           for (let i = 0; i < result.length; i++) {
             const curClass = result[i];
             this.classMap[result[i].id] = result[i];
-            let curLevel = data.find(v => v.value === curClass.level);
+            let curLevel = data.find((v) => v.value === curClass.level);
             if (!curLevel) {
               curLevel = {
                 value: curClass.level,
                 label: curClass.level,
-                children: []
+                children: [],
               };
               data.push(curLevel);
             }
             curLevel.children.push({
               value: curClass.id,
-              label: curClass.cno
+              label: curClass.cno,
             });
           }
           this.options = data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "班级列表数据获取失败！",
-            type: "error"
+            type: "error",
           });
         });
     },
@@ -171,16 +173,16 @@ export default {
           exam_id: this.exam_id,
           exam_detail_id: this.exam_detail_id,
           class_id: this.gradeForm.class,
-          grade_file_path: this.gradeFileName
+          grade_file_path: this.gradeFileName,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.result) {
             this.dialogGrade = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "上传成功！",
-              type: "success"
+              type: "success",
             });
             return;
           }
@@ -188,20 +190,20 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error"
+              type: "error",
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
     deleteRow(row) {
       this.$request
         .fetchDelGradereport({
-          class_grade_report_id: row.class_grade_report_id
+          class_grade_report_id: row.class_grade_report_id,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.result) {
             this.getList();
             this.$message.success("删除成功");
@@ -222,8 +224,15 @@ export default {
     },
     handleChange(value) {
       this.gradeForm.class = value[1];
-    }
-  }
+    },
+    back() {
+      this.$emit("func", {
+        exam_name: this.param.exam_name,
+        exam_id: this.param.exam_id,
+      });
+      this.$store.dispatch("setExamLevel", "subject");
+    },
+  },
 };
 </script>
 

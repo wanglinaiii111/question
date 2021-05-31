@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template>
+    <template v-if="$store.getters.examLevel === 'exam'">
       <el-button class="addBtn" size="medium" @click="dialogVisible = true"
         >创建考试</el-button
       >
@@ -35,37 +35,36 @@
           </template>
         </el-table-column>
       </el-table>
-    </template>
-    <el-dialog title="创建考试" :visible.sync="dialogVisible" width="337px">
-      <el-form :model="ruleForm" label-width="80px">
-        <el-form-item label="考试名称">
-          <el-input v-model="ruleForm.name"></el-input>
-        </el-form-item>
-        <el-form-item label="开始时间">
-          <el-date-picker
-            v-model="ruleForm.start_time"
-            type="datetime"
-            placeholder="选择开始时间"
-            value-format="yyyy-MM-dd HH:mm:ss"
-          >
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="结束时间">
-          <el-date-picker
-            v-model="ruleForm.end_time"
-            type="datetime"
-            placeholder="选择结束时间"
-            value-format="yyyy-MM-dd HH:mm:ss"
-          >
-          </el-date-picker>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="create">确 定</el-button>
-      </span>
-    </el-dialog>
-    <!-- <el-dialog title="添加科目" :visible.sync="dialogSubVisible" width="357px">
+      <el-dialog title="创建考试" :visible.sync="dialogVisible" width="337px">
+        <el-form :model="ruleForm" label-width="80px">
+          <el-form-item label="考试名称">
+            <el-input v-model="ruleForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="开始时间">
+            <el-date-picker
+              v-model="ruleForm.start_time"
+              type="datetime"
+              placeholder="选择开始时间"
+              value-format="yyyy-MM-dd HH:mm:ss"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="结束时间">
+            <el-date-picker
+              v-model="ruleForm.end_time"
+              type="datetime"
+              placeholder="选择结束时间"
+              value-format="yyyy-MM-dd HH:mm:ss"
+            >
+            </el-date-picker>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="create">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- <el-dialog title="添加科目" :visible.sync="dialogSubVisible" width="357px">
       <el-form :model="formAddSub" label-width="100px">
         <el-form-item label="考试科目">
           <el-select
@@ -113,12 +112,29 @@
         <el-button type="primary" @click="submitAddSubject">确 定</el-button>
       </span>
     </el-dialog> -->
+    </template>
+    <SubjectList
+      v-else-if="$store.getters.examLevel === 'subject'"
+      :param="curRow"
+      @func="getMsg"
+    ></SubjectList>
+    <ClassReport
+      v-else-if="$store.getters.examLevel === 'grade'"
+      :param="gradeParam"
+      @func="getGradeMsg"
+    ></ClassReport>
   </div>
 </template>
 
 <script>
+import SubjectList from "./subjectList";
+import ClassReport from "./classReport";
 export default {
   name: "student",
+  components: {
+    SubjectList: SubjectList,
+    ClassReport: ClassReport,
+  },
   data() {
     return {
       dialogVisible: false,
@@ -126,12 +142,12 @@ export default {
       ruleForm: {
         name: "",
         start_time: "",
-        end_time: ""
+        end_time: "",
       },
       formAddSub: {
         subject_id: "1",
         question_file_path: "",
-        answer_file_path: ""
+        answer_file_path: "",
       },
       tableData: [],
       allSubjectList: [],
@@ -139,11 +155,17 @@ export default {
       // answersFileList: [],
       // fileName: "",
       // answersFileName: ""
+      curRow: {},
+      gradeParam: {},
     };
   },
   mounted() {
     this.getList();
     this.getSubjectList();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.$store.dispatch("setExamLevel", "exam");
+    next();
   },
   methods: {
     // upload(param, type) {
@@ -168,20 +190,20 @@ export default {
     getList() {
       this.$request
         .fetchSelectExam({})
-        .then(res => {
+        .then((res) => {
           this.tableData = res.data.result;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
     getSubjectList() {
       this.$request
         .fetchSelectSubject({})
-        .then(res => {
+        .then((res) => {
           this.allSubjectList = res.data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -190,16 +212,16 @@ export default {
         .fetchCreateExam({
           name: this.ruleForm.name,
           start_time: this.ruleForm.start_time,
-          end_time: this.ruleForm.end_time
+          end_time: this.ruleForm.end_time,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.result) {
             this.dialogVisible = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "创建成功！",
-              type: "success"
+              type: "success",
             });
             return;
           }
@@ -207,26 +229,26 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error"
+              type: "error",
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
     delete(id) {
       this.$request
         .fetchDelExam({ exam_id: id })
-        .then(res => {
+        .then((res) => {
           this.getList();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success"
+            type: "success",
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -276,13 +298,18 @@ export default {
     //     });
     // },
     showSubject(row) {
-      this.$router.push({
-        path: "/subjectList",
-        query: {
-          exam_id: row.exam_id,
-          exam_name: row.name
-        }
-      });
+      // this.$router.push({
+      //   path: "/subjectList",
+      //   query: {
+      //     exam_id: row.exam_id,
+      //     exam_name: row.name,
+      //   },
+      // });
+      this.curRow = {
+        exam_id: row.exam_id,
+        exam_name: row.name,
+      };
+      this.$store.dispatch("setExamLevel", "subject");
     },
     handleExceed(type) {
       this.$message.warning(`您已上传${type}，请将已上传的文件删除后重新上传`);
@@ -290,8 +317,14 @@ export default {
     changeSubject() {
       this.fileList = [];
       this.answersFileList = [];
-    }
-  }
+    },
+    getMsg(p) {
+      this.gradeParam = p;
+    },
+    getGradeMsg(p) {
+      this.curRow = p;
+    },
+  },
 };
 </script>
 
