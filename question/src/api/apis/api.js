@@ -110,6 +110,11 @@ export default {
       params: data
     });
   },
+  fetchDelGradereport(data) {
+    return axios.get(apiUrls.delGradereport, {
+      params: data
+    });
+  },
   //查询某场考试某个科目下所有班级成绩单 GET
   fetchSelectGradereport(data) {
     return axios.get(apiUrls.selectGradereport, {
@@ -118,7 +123,12 @@ export default {
   },
   //文件上传接口(表单提交) POST
   fetchExamUpload(data) {
-    console.log('123');
     return axios.post(apiUrls.examUpload, data);
+  },
+  fetchDownload(data) {
+    return axios.get(apiUrls.download, {
+      params: data,
+      responseType: "blob"
+    });
   }
 };

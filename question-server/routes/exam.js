@@ -46,17 +46,17 @@ router.get('/create/gradereport', async function (req, res, next) {
     res.send(result);
 });
 
+router.get('/delete/gradereport', async function (req, res, next) {
+    let p = req.query;
+    let result = await examDao.delGradeReport(p);
+    res.send(result);
+});
+
 router.get('/select/gradereport', async function (req, res, next) {
     let p = req.query;
     let result = await examDao.selectGradeReport(p);
     res.send(result);
 });
-
-// router.post('/file/upload', async function (req, res, next) {
-//     let p = req.body;
-//     let result = await examDao.examUpload(p);
-//     res.send(result);
-// });
 
 router.post('/file/upload', multipartMiddleware, (req, res, next) => {
     const formData = new FormData();
@@ -94,6 +94,65 @@ router.post('/file/upload', multipartMiddleware, (req, res, next) => {
             });
         }
     }
+});
+
+let request = require('request');
+router.get('/download', async function (req, res, next) {
+    let p = req.query;
+    request
+        .post({
+            url: config.api_url + '/exam/file/download',
+            json: req.query,
+            headers: {
+                'Content-Type': 'application/octet-stream',
+            },
+        })
+        .on('response', function (response) {
+            if (response.statusCode != '200') {
+                res.send({ desc: '服务器500' });
+                return;
+            }
+
+            // 直接转回前端
+            this.pipe(res);
+            return;
+            // 下载到文本再转回前端
+            let filePath = path.join(__dirname, req.query.filename);
+            let file = fs.createWriteStream(filePath);
+            response.pipe(file).on('close', function (err) {
+                console.log('文件下载完毕');
+                res.set({
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Disposition': 'attachment; filename=' + req.query.filename,
+                });
+                var fileStream = fs.createReadStream(filePath);
+                fileStream.on('data', function (data) {
+                    res.write(data, 'binary');
+                });
+                fileStream.on('end', function () {
+                    res.end();
+                    console.log('The file has been downloaded successfully!');
+                });
+            });
+        });
+
+    // axios
+    //     .post(
+    //         config.api_url + '/exam/file/download',
+    //         { filename: p.filename },
+    //         {
+    //             headers: {
+    //                 'Content-Type': 'application/octet-stream',
+    //             },
+    //         }
+    //     )
+    //     .then((res1) => {
+    //         res.pipe(res1);
+    //     })
+    //     .catch((e) => {
+    //         res.send({ err: e });
+    //     })
+    //     .finally(() => {});
 });
 
 module.exports = router;

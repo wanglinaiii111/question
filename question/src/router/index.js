@@ -34,6 +34,7 @@ const classManage = () => import("@/views/classManage");
 const examManage = () => import("@/views/examManage");
 const subjectList = () => import("@/views/subjectList");
 const classReport = () => import("@/views/classReport");
+const download = () => import("@/views/download");
 
 /**
  * 重写路由的push方法
@@ -109,6 +110,23 @@ let addRouter = [
         iconCls: "fa fa-newspaper-o", // 图标样式class
         name: "classManage",
         component: classManage,
+        children: []
+      }
+    ]
+  },
+  {
+    path: "/download",
+    iconCls: "fa fa-download", // 图标样式class
+    name: routeName.download,
+    meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
+    component: Layout,
+    alone: true,
+    children: [
+      {
+        path: "/download",
+        iconCls: "fa fa-download", // 图标样式class
+        name: "download",
+        component: download,
         children: []
       }
     ]

@@ -1,5 +1,5 @@
 let url = "http://localhost:8002/";
-url = "./"; // 打包时配置
+// url = "./"; // 打包时配置
 
 let api = {
   // 登录post
@@ -42,10 +42,12 @@ let api = {
   selectExamsubject: "exam/select/examsubject",
   //上传考试 班级成绩单 GET （上传的是某个班级的考试成绩表格）
   createGradereport: "exam/create/gradereport",
+  delGradereport: "exam/delete/gradereport",
   //查询某场考试某个科目下所有班级成绩单 GET
   selectGradereport: "exam/select/gradereport",
   //文件上传接口(表单提交) POST
-  examUpload: "exam/file/upload"
+  examUpload: "exam/file/upload",
+  download: "exam/download"
 };
 for (const key in api) {
   api[key] = url + api[key];

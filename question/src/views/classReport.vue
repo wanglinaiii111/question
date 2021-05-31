@@ -18,6 +18,18 @@
           property="grade_file_path"
           label="成绩单"
         ></el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-popconfirm
+              title="确定删除这个成绩单吗？"
+              @confirm="deleteRow(scope.row)"
+            >
+              <el-button slot="reference" size="mini" type="danger"
+                >删除</el-button
+              >
+            </el-popconfirm>
+          </template>
+        </el-table-column>
       </el-table>
     </template>
     <el-dialog title="上传成绩单" :visible.sync="dialogGrade" width="347px">
@@ -67,7 +79,8 @@ export default {
       gradeForm: {
         class: ""
       },
-      options: []
+      options: [],
+      classMap: {}
     };
   },
   mounted() {
@@ -92,8 +105,14 @@ export default {
         });
     },
     upload(param, type) {
+      if (!this.gradeForm.class) {
+        this.$message.error("请先选择班级");
+        return;
+      }
+      const level = this.classMap[this.gradeForm.class].level;
+      const cno = this.classMap[this.gradeForm.class].cno;
       const fileType = param.file.name.split(".").pop();
-      const filename = `${this.exam_id}_${this.subject_id}_${type}.${fileType}`;
+      const filename = `${this.exam_id}_${this.subject_id}_${level}_${cno}_${type}.${fileType}`;
       this.gradeFileName = filename;
       let formData = new FormData();
       formData.append("files", param.file);
@@ -116,6 +135,7 @@ export default {
           let data = [];
           for (let i = 0; i < result.length; i++) {
             const curClass = result[i];
+            this.classMap[result[i].id] = result[i];
             let curLevel = data.find(v => v.value === curClass.level);
             if (!curLevel) {
               curLevel = {
@@ -174,6 +194,22 @@ export default {
         })
         .catch(error => {
           console.log(error);
+        });
+    },
+    deleteRow(row) {
+      this.$request
+        .fetchDelGradereport({
+          class_grade_report_id: row.class_grade_report_id
+        })
+        .then(res => {
+          if (res.data.result) {
+            this.getList();
+            this.$message.success("删除成功");
+            return;
+          }
+          if (res.data.desc) {
+            this.$message.error(res.data.desc);
+          }
         });
     },
     clickUpload() {

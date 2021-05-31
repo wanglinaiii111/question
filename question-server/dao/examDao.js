@@ -49,6 +49,14 @@ async function createGradeReport(param) {
   });
 }
 
+async function delGradeReport(param) {
+  return await common.service({
+    url: config.api_url + '/exam/delete/gradereport',
+    method: 'get',
+    params: param,
+  });
+}
+
 async function selectGradeReport(param) {
   return await common.service({
     url: config.api_url + '/exam/select/gradereport',
@@ -72,6 +80,7 @@ module.exports = {
   createExamSubject,
   selectExamSubject,
   createGradeReport,
+  delGradeReport,
   selectGradeReport,
   examUpload,
 };

@@ -105,18 +105,7 @@ export default {
         sex: "男",
         class: ""
       },
-      options: [
-        {
-          value: "zhinan",
-          label: "指南",
-          children: [
-            {
-              value: "shejiyuanze",
-              label: "设计原则"
-            }
-          ]
-        }
-      ],
+      options: [],
       tableData: []
     };
   },

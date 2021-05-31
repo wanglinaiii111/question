@@ -12,7 +12,8 @@ const cn = {
     classManage: "班级管理",
     examManage: "考试管理",
     subjectList: "科目列表",
-    classReport: "成绩单"
+    classReport: "成绩单",
+    download: "文件下载"
   },
   rightMenu: {
     close: "关闭",
