@@ -13,7 +13,8 @@ const cn = {
     examManage: "考试管理",
     subjectList: "科目列表",
     classReport: "成绩单",
-    download: "文件下载"
+    download: "文件下载",
+    questionManage: "题库管理"
   },
   rightMenu: {
     close: "关闭",

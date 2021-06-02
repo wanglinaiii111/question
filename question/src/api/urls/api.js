@@ -1,5 +1,5 @@
 let url = "http://localhost:8002/";
-url = "./"; // 打包时配置
+// url = "./"; // 打包时配置
 
 let api = {
   // 登录post
@@ -47,7 +47,9 @@ let api = {
   selectGradereport: "exam/select/gradereport",
   //文件上传接口(表单提交) POST
   examUpload: "exam/file/upload",
-  download: "exam/download"
+  download: "exam/download",
+  getKnowledge: "question/getKnowledge",
+  selectQuestion: "question/select"
 };
 for (const key in api) {
   api[key] = url + api[key];

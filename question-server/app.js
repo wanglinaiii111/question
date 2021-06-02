@@ -22,6 +22,7 @@ const classRouter = require('./routes/class');
 const studentRouter = require('./routes/student');
 const examRouter = require('./routes/exam');
 const subjectRouter = require('./routes/subject');
+const questionRouter = require('./routes/question');
 
 const MongoClient = require('mongodb').MongoClient;
 let mongoUrl = 'mongodb://' + Config.sys_mongo;
@@ -240,6 +241,7 @@ app.use('/class', classRouter);
 app.use('/student', studentRouter);
 app.use('/exam', examRouter);
 app.use('/subject', subjectRouter);
+app.use('/question', questionRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

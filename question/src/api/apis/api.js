@@ -130,5 +130,15 @@ export default {
       params: data,
       responseType: "blob"
     });
+  },
+  //查询知识点图谱 get
+  fetchKnowledgeNode(data) {
+    return axios.get(apiUrls.getKnowledge, {
+      params: data
+    });
+  },
+  //查询题库中的试题 POST
+  fetchQuestion(data) {
+    return axios.post(apiUrls.selectQuestion, data);
   }
 };

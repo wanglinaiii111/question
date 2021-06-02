@@ -35,6 +35,7 @@ const examManage = () => import("@/views/examManage");
 const subjectList = () => import("@/views/subjectList");
 const classReport = () => import("@/views/classReport");
 const download = () => import("@/views/download");
+const questionManage = () => import("@/views/questionManage");
 
 /**
  * 重写路由的push方法
@@ -80,6 +81,23 @@ let defaultRouter = [
 ];
 
 let addRouter = [
+  {
+    path: "/questionManage",
+    iconCls: "fa fa-book", // 图标样式class
+    name: routeName.questionManage,
+    meta: { role: ["superAdmin", "admin"], isShowTabNav: true },
+    component: Layout,
+    alone: true,
+    children: [
+      {
+        path: "/questionManage",
+        iconCls: "fa fa-book", // 图标样式class
+        name: "questionManage",
+        component: questionManage,
+        children: []
+      }
+    ]
+  },
   {
     path: "/studentManage",
     iconCls: "fa fa-id-card-o", // 图标样式class
