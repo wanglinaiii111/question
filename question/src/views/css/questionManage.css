@@ -1,0 +1,69 @@
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color: #ffffff;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.select {
+    margin-bottom: 10px;
+}
+
+.left {
+    width: 225px;
+    border-right: 1px dashed #b9b7b7;
+    padding-right: 5px;
+    box-sizing: border-box;
+}
+
+.tree {
+    width: 100%;
+    height: calc(100% - 46px);
+    overflow: auto;
+}
+
+.tree::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.right::-webkit-scrollbar {
+    width: 10px;
+    height: 0px;
+}
+
+.right::-webkit-scrollbar-thumb,
+.tree::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #ededed;
+}
+
+.right {
+    width: 100%;
+    padding: 0 15px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.tools {
+    padding-bottom: 20px;
+}
+
+.box-card {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.clearfix {
+    color: #666666;
+    font-size: 12px;
+}
+
+.title {
+    padding-bottom: 20px;
+    line-height: 24px;
+    color: #333;
+    font-size: 14px;
+}
