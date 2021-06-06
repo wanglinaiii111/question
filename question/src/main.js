@@ -9,6 +9,7 @@ import i18n from "./i18n/i18n"
 import globalPlugin from "./utils/global"
 import permission from "./directive/permission/button"
 import NProgress from "nprogress"
+import TEditor from '@/components/TEditor.vue'
 
 import "nprogress/nprogress.css"
 import "element-ui/lib/theme-chalk/index.css"
@@ -20,6 +21,8 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(globalPlugin)
 Vue.use(permission)
+
+Vue.component('TEditor',TEditor)
 
 NProgress.inc(0.2)
 NProgress.configure({ easing: "ease", speed: 500, showSpinner: false })

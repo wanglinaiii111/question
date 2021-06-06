@@ -49,7 +49,11 @@ let api = {
   examUpload: "exam/file/upload",
   download: "exam/download",
   getKnowledge: "question/getKnowledge",
-  selectQuestion: "question/select"
+  selectQuestion: "question/select",
+  addQuestion: "question/add",
+  delQuestion: "question/del",
+  updateQuestion: "question/update",
+  matchingQuestion: "question/matching",
 };
 for (const key in api) {
   api[key] = url + api[key];

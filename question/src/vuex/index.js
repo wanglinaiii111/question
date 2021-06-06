@@ -38,7 +38,8 @@ const store = new Vuex.Store({
     left: state => state.layout.left,
     top: state => state.layout.top,
     rightNav: state => state.layout.rightNav,
-    examLevel: state => state.layout.examLevel
+    examLevel: state => state.layout.examLevel,
+    questionLevel: state => state.layout.questionLevel
   },
   modules: {
     routerData,

@@ -16,4 +16,28 @@ router.post('/select', async function (req, res, next) {
   res.send(result);
 });
 
+router.post('/add', async function (req, res, next) {
+  let p = req.body;
+  let result = await questionDao.add(p);
+  res.send(result);
+});
+
+router.post('/update', async function (req, res, next) {
+  let p = req.body;
+  let result = await questionDao.update(p);
+  res.send(result);
+});
+
+router.post('/del', async function (req, res, next) {
+  let p = req.query;
+  let result = await questionDao.del(p);
+  res.send(result);
+});
+
+router.post('/matching', async function (req, res, next) {
+  let p = req.body;
+  let result = await questionDao.matching(p);
+  res.send(result);
+});
+
 module.exports = router;

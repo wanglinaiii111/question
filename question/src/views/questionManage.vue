@@ -1,65 +1,95 @@
 <template>
-  <div class="container">
-    <div class="left">
-      <el-select
-        v-model="subject_id"
-        size="medium"
-        placeholder="请选择考试科目"
-        filterable
-        @change="changeSubject"
-        class="select"
-      >
-        <el-option
-          v-for="item in allSubjectList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"
-        ></el-option>
-      </el-select>
-      <div class="tree">
-        <el-tree
-          :props="props"
-          :load="loadNode"
-          lazy
-          highlight-current
-          @node-click="handleClickNode"
+  <div class="ques">
+    <div class="container" v-if="$store.getters.questionLevel === 'list'">
+      <div class="left">
+        <el-select
+          v-model="subject_id"
+          size="medium"
+          placeholder="请选择考试科目"
+          filterable
+          @change="changeSubject"
+          class="select"
         >
-        </el-tree>
+          <el-option
+            v-for="item in allSubjectList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+        <div class="tree">
+          <el-tree
+            :props="props"
+            :load="loadNode"
+            lazy
+            highlight-current
+            @node-click="handleClickNode"
+          ></el-tree>
+        </div>
+      </div>
+      <div class="right" v-loading.lock="fullscreenLoading">
+        <div class="tools">
+          <el-radio-group v-model="libType" @change="changeLibType">
+            <el-radio :label="1">公共题库</el-radio>
+            <el-radio :label="2">推荐题库</el-radio>
+          </el-radio-group>
+          <div class="btns">
+            <el-button size="medium" @click="toEdit('add')">新建试题</el-button>
+          </div>
+        </div>
+        <el-card class="box-card" v-for="item in questionList" :key="item.id">
+          <div slot="header" class="clearfix">
+            <div>
+              <span>{{ item.qtype }}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span>{{ item.source }}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span>{{ item.difficulty }}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span>{{ item.nums }}</span>
+              <el-divider direction="vertical"></el-divider>
+              <span>{{ item.update_time }}</span>
+            </div>
+            <div class="toolBtn">
+              <el-button class="addBtn" size="mini" @click="toEdit('update',item)">更新</el-button>
+              <el-popconfirm title="确定删除这道题吗？" @confirm="deleteQues(item.id)">
+                <el-button slot="reference" size="mini" type="danger">删除</el-button>
+              </el-popconfirm>
+            </div>
+          </div>
+          <div>
+            <div class="title">
+              {{ item.qno }}
+              <!-- <div class="toolBtn">
+                <el-button class="addBtn" size="mini" @click="this.curQues = item">更新</el-button>
+                <el-popconfirm title="确定删除这道题吗？" @confirm="deleteQues(item.id)">
+                  <el-button slot="reference" size="mini" type="danger">删除</el-button>
+                </el-popconfirm>
+              </div>-->
+              <span v-html=" HtmlUtil.htmlDecodeByRegExp(item.stem)"></span>
+            </div>
+            <img v-if="isImage(item.answer)" :src="item.answer" alt />
+            <span v-else v-html=" HtmlUtil.htmlDecodeByRegExp(item.answer)"></span>
+          </div>
+        </el-card>
       </div>
     </div>
-    <div class="right">
-      <div class="tools">
-        <el-radio-group v-model="libType" @change="changeLibType">
-          <el-radio :label="1">公共题库</el-radio>
-          <el-radio :label="2">推荐题库</el-radio>
-        </el-radio-group>
-      </div>
-      <el-card class="box-card" v-for="item in questionList" :key="item.id">
-        <div slot="header" class="clearfix">
-          <span>{{ item.qtype }}</span>
-          <el-divider direction="vertical"></el-divider>
-          <span>{{ item.source }}</span>
-          <el-divider direction="vertical"></el-divider>
-          <span>{{ item.difficulty }}</span>
-          <el-divider direction="vertical"></el-divider>
-          <span>{{ item.nums }}</span>
-          <el-divider direction="vertical"></el-divider>
-          <span>{{ item.update_time }}</span>
-        </div>
-        <div>
-          <div class="title">{{ item.qno }}{{ item.stem }}</div>
-          <img :src="item.answer" alt="" />
-        </div>
-      </el-card>
-    </div>
+    <AddQuestion v-else :updateData="curQues"></AddQuestion>
   </div>
 </template>
 
 <script>
+import addQuestion from "./addQuestion";
+import { HtmlUtil } from "../utils/htmlEncode";
 export default {
   name: "question",
+  components: {
+    AddQuestion: addQuestion
+  },
   data() {
     return {
+      fullscreenLoading: false,
+      HtmlUtil: HtmlUtil,
       subject_id: "4",
       allSubjectList: [],
       questionList: [],
@@ -68,11 +98,12 @@ export default {
         isLeaf: (data, node) => {
           // is_have_childe 1有子节点 0没有子节点
           return data.is_have_childe === 0 ? true : false;
-        },
+        }
       },
       resolve: null,
-      keyword: "牛顿第二定律的同向性||平衡状态的定义及条件",
+      keyword: "",
       libType: 1,
+      curQues: null
     };
   },
   mounted() {
@@ -83,31 +114,35 @@ export default {
       this.$request
         .fetchKnowledgeNode({
           parentid: id,
-          subjectid: this.subject_id,
+          subjectid: this.subject_id
         })
-        .then((res) => {
+        .then(res => {
           this.resolve(res.data);
           if (id === 0) {
+            this.keyword = res.data[0].name;
             this.getQuestion();
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err);
         });
     },
     getQuestion() {
+      if (!this.keyword) return;
+      this.fullscreenLoading = true;
       this.$request
         .fetchQuestion({
           libtype: this.libType,
           keyword: this.keyword,
-          subject_id: this.subject_id,
+          subject_id: this.subject_id
         })
-        .then((res) => {
+        .then(res => {
           this.questionList = res.data;
+          this.fullscreenLoading = false;
         });
     },
     getSubjectList() {
-      this.$request.fetchSelectSubject({}).then((res) => {
+      this.$request.fetchSelectSubject({}).then(res => {
         this.allSubjectList = res.data;
       });
     },
@@ -136,7 +171,42 @@ export default {
       this.libType = val;
       this.getQuestion();
     },
-  },
+    isImage(str) {
+      if (!str) return;
+      return str.indexOf("http") == 0 ? true : false;
+    },
+    deleteQues(id) {
+      this.$request
+        .fetchDelQuestion({ id: id, libtype: this.libType })
+        .then(res => {
+          this.getQuestion();
+          this.$message({
+            showClose: true,
+            message: "删除成功！",
+            type: "success"
+          });
+        })
+        .catch(error => {
+          console.log(error);
+          this.$message({
+            showClose: true,
+            message: "删除失败！",
+            type: "error"
+          });
+        });
+    },
+    toEdit(type, data) {
+      this.curQues = null;
+      if (type === "update") {
+        this.curQues = {
+          ...data,
+          libType: this.libType,
+          subject_id: this.subject_id
+        };
+      }
+      this.$store.dispatch("setQuestionLevel", type);
+    }
+  }
 };
 </script>
 

@@ -17,7 +17,8 @@ export default {
         path: "/examManage"
       }
     ],
-    examLevel: "exam"
+    examLevel: "exam",
+    questionLevel: 'list'
   },
   mutations: {
     addTab(state, arg) {
@@ -51,7 +52,7 @@ export default {
       state.rightNav = arg;
     },
     removeTab(state, arg) {
-      let index = state.tabnavBox.findIndex(function(value, key) {
+      let index = state.tabnavBox.findIndex(function (value, key) {
         return value.path === arg.tabItem.path;
       });
       state.tabnavBox.splice(index, 1);
@@ -79,7 +80,7 @@ export default {
     collapse(state, arg) {
       state.isCollapse = !state.isCollapse;
       if (state.logoShow) {
-        setTimeout(function() {
+        setTimeout(function () {
           state.logoShow = false;
         }, 300);
       } else {
@@ -88,6 +89,9 @@ export default {
     },
     setExamLevel(state, type) {
       state.examLevel = type;
+    },
+    setQuestionLevel(state, type) {
+      state.questionLevel = type;
     }
   },
   actions: {
@@ -108,6 +112,9 @@ export default {
     },
     setExamLevel({ commit }, type) {
       commit("setExamLevel", type);
+    },
+    setQuestionLevel({ commit }, type) {
+      commit("setQuestionLevel", type);
     }
   }
 };

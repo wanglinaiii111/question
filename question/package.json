@@ -15,6 +15,7 @@
     "startdll": "webpack --config build/webpack.dll.config.js"
   },
   "dependencies": {
+    "@tinymce/tinymce-vue": "^3.2.4",
     "axios": "^0.19.2",
     "echarts": "^4.1.0",
     "element-ui": "^2.13.1",
@@ -23,6 +24,7 @@
     "nprogress": "^0.2.0",
     "scriptjs": "^2.5.8",
     "sortablejs": "^1.7.0",
+    "tinymce": "^5.8.1",
     "vue": "^2.6.11",
     "vue-i18n": "^8.4.0",
     "vue-router": "^3.5.1",

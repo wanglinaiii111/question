@@ -140,5 +140,23 @@ export default {
   //查询题库中的试题 POST
   fetchQuestion(data) {
     return axios.post(apiUrls.selectQuestion, data);
+  },
+  //.试题添加 POST
+  fetchAddQuestion(data) {
+    return axios.post(apiUrls.addQuestion, data);
+  },
+  //.试题删除  GET
+  fetchDelQuestion(data) {
+    return axios.get(apiUrls.delQuestion, {
+      params: data,
+    });
+  },
+  //试题匹配
+  fetchMatchingQuestion(data) {
+    return axios.post(apiUrls.matchingQuestion, data);
+  },
+  //试题修改更新  POST JSON
+  fetchUpdateQuestion(data) {
+    return axios.post(apiUrls.updateQuestion, data);
   }
 };
