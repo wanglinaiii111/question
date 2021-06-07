@@ -1,8 +1,11 @@
 <template>
   <div class="addQues">
     <el-button size="medium" @click="back">返回上一级</el-button>
+    <img src="http://localhost:8002/exam/download?filename=1623050330473.png&stempic=1&answerpic=''" alt="">
     <div class="formContainer">
-      <h1 class="quesTitle">创建试题</h1>
+      <h1 class="quesTitle">
+        {{ $store.getters.questionLevel === "add" ? "创建试题" : "更新试题" }}
+      </h1>
       <el-form :model="form" label-width="80px">
         <el-form-item label="题库类型">
           <el-radio-group v-model="form.libType" @change="changeLibType">
@@ -14,7 +17,12 @@
           <el-input v-model="form.qtype" size="medium"></el-input>
         </el-form-item>
         <el-form-item label="难度">
-          <el-input-number v-model="form.difficulty" size="medium" :precision="2" :step="0.1"></el-input-number>
+          <el-input-number
+            v-model="form.difficulty"
+            size="medium"
+            :precision="2"
+            :step="0.1"
+          ></el-input-number>
         </el-form-item>
         <el-form-item label="来源">
           <el-input v-model="form.source" size="medium"></el-input>
@@ -26,7 +34,7 @@
             placeholder="请选择考试科目"
             filterable
             @change="changeSubject"
-            class="select"
+            :disabled="$store.getters.questionLevel === 'update' ? true : false"
           >
             <el-option
               v-for="item in allSubjectList"
@@ -68,7 +76,15 @@
           </div>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="onSubmit">立即创建</el-button>
+          <el-button
+            v-if="$store.getters.questionLevel === 'add'"
+            type="primary"
+            @click="onSubmit"
+            >立即创建</el-button
+          >
+          <el-button v-else type="primary" @click="onSubmitUpdate"
+            >更新</el-button
+          >
           <el-button @click="back">取消</el-button>
         </el-form-item>
       </el-form>
@@ -106,7 +122,7 @@ export default {
         exam_detail_id: "",
         stem: "",
         answer: "",
-        subject_id: "4"
+        subject_id: "4",
       },
       props: {
         lazy: true,
@@ -119,7 +135,7 @@ export default {
             if (node.data.is_have_childe === 0) return;
             that.getKnowledgeNode(node.data.tree_id);
           }
-        }
+        },
       },
       examProps: {
         lazy: true,
@@ -130,8 +146,8 @@ export default {
           } else {
             that.getExam_subjectList(node.data.value);
           }
-        }
-      }
+        },
+      },
     };
   },
   mounted() {
@@ -139,11 +155,12 @@ export default {
     if (this.updateData) {
       this.form = {
         ...this.updateData,
+        points: this.updateData.parentNodes,
         isExam: this.updateData.exam_detail_id ? 1 : 0,
         stem: HtmlUtil.htmlDecodeByRegExp(this.updateData.stem),
         answer: this.isImage(this.updateData.answer)
           ? `<img src=${this.updateData.answer} alt />`
-          : HtmlUtil.htmlDecodeByRegExp(this.updateData.answer)
+          : HtmlUtil.htmlDecodeByRegExp(this.updateData.answer),
       };
     }
     this.getSubjectList();
@@ -153,54 +170,54 @@ export default {
       this.$request
         .fetchKnowledgeNode({
           parentid: id,
-          subjectid: this.form.subject_id
+          subjectid: this.form.subject_id,
         })
-        .then(res => {
-          const nodes = res.data.map(item => ({
+        .then((res) => {
+          const nodes = res.data.map((item) => ({
             value: item.name,
             tree_id: item.tree_id,
             label: item.name,
-            leaf: item.is_have_childe === 0 ? true : false
+            leaf: item.is_have_childe === 0 ? true : false,
           }));
           this.resolve(nodes);
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
     getSubjectList() {
-      this.$request.fetchSelectSubject({}).then(res => {
+      this.$request.fetchSelectSubject({}).then((res) => {
         this.allSubjectList = res.data;
       });
     },
     getExamList() {
       this.$request
         .fetchSelectExam({})
-        .then(res => {
+        .then((res) => {
           console.log(res.data.result);
-          const nodes = res.data.result.map(item => ({
+          const nodes = res.data.result.map((item) => ({
             value: item.exam_id,
-            label: item.name
+            label: item.name,
           }));
           console.log(nodes);
           this.resolve_exam(nodes);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
     getExam_subjectList(id) {
       this.$request
         .fetchSelectExamsubject({ exam_id: id })
-        .then(res => {
-          const nodes = res.data.map(item => ({
+        .then((res) => {
+          const nodes = res.data.map((item) => ({
             value: item.exam_detail_id,
             label: item.subject_name,
-            leaf: true
+            leaf: true,
           }));
           this.resolve_exam(nodes);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -215,13 +232,15 @@ export default {
     },
     changePoint(val) {
       console.log(val);
-      this.form.points = val[val.length - 1];
+      // this.form.points = val[val.length - 1];
+      this.form.points = val;
     },
     changeExamId(val) {
       console.log(val);
       this.form.exam_detail_id = val[val.length - 1];
     },
     onSubmit() {
+      //创建
       console.log(this.form);
       if (this.form.isExam === 1 && !this.form.exam_detail_id) {
         return this.$message.error("请为考试题选择考试科目");
@@ -238,8 +257,49 @@ export default {
       if (!this.form.answer) {
         return this.$message.error("请为试题添加答案");
       }
+      const len = this.form.points.length;
       this.$request
         .fetchAddQuestion({
+          libtype: this.form.libType,
+          qtype: this.form.qtype,
+          difficulty: this.form.difficulty,
+          nums: "0",
+          qno: new Date().getTime(),
+          stem: HtmlUtil.htmlEncodeByRegExp(this.form.stem),
+          source: this.form.source,
+          points: len > 1 ? this.form.points[len - 1] : this.form.points[0],
+          answer: HtmlUtil.htmlEncodeByRegExp(this.form.answer),
+          exam_detail_id:
+            this.form.isExam === 1 ? this.form.exam_detail_id : "",
+          subject_id: this.form.subject_id,
+        })
+        .then((res) => {
+          if (res.data.result) {
+            this.$store.dis;
+            this.$message({
+              showClose: true,
+              message: "创建成功！",
+              type: "success",
+            });
+            return;
+          }
+          if (res.data.desc) {
+            this.confirmBack();
+            this.$message({
+              showClose: true,
+              message: res.data.desc,
+              type: "error",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    onSubmitUpdate() {
+      //更新
+      this.$request
+        .fetchUpdateQuestion({
           libtype: this.form.libType,
           qtype: this.form.qtype,
           difficulty: this.form.difficulty,
@@ -251,15 +311,15 @@ export default {
           answer: HtmlUtil.htmlEncodeByRegExp(this.form.answer),
           exam_detail_id:
             this.form.isExam === 1 ? this.form.exam_detail_id : "",
-          subject_id: this.form.subject_id
+          id: this.form.id,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.result) {
             this.$store.dis;
             this.$message({
               showClose: true,
-              message: "创建成功！",
-              type: "success"
+              message: "更新成功！",
+              type: "success",
             });
             return;
           }
@@ -268,11 +328,11 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error"
+              type: "error",
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -286,18 +346,23 @@ export default {
     isImage(str) {
       if (!str) return;
       return str.indexOf("http") == 0 ? true : false;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
+.addQues {
+  width: 100%;
+}
+
 .formContainer {
   width: 100%;
   height: 100%;
   background-color: #ffffff;
   margin-top: 20px;
-  padding: 20px 10px 0;
+  padding: 20px 10px;
+  box-sizing: border-box;
 }
 
 .quesTitle {

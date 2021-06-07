@@ -1,6 +1,11 @@
 <template>
   <div class="tinymce-box">
-    <Editor v-model="contentValue" :init="init" :disabled="disabled" @onClick="onClick" />
+    <Editor
+      v-model="contentValue"
+      :init="init"
+      :disabled="disabled"
+      @onClick="onClick"
+    />
   </div>
 </template>
 
@@ -56,29 +61,29 @@ import "tinymce/plugins/wordcount"; //字数统计
 export default {
   name: "TEditor",
   components: {
-    Editor
+    Editor,
   },
   props: {
     value: {
       type: String,
-      default: ""
+      default: "",
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     plugins: {
       type: [String, Array],
       default:
-        "print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount textpattern autosave "
+        "print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount textpattern autosave ",
     },
     toolbar: {
       type: [String, Array],
       default:
         "fullscreen undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | \
                 styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
-                table image media charmap hr pagebreak insertdatetime print preview | code selectall searchreplace visualblocks | indent2em lineheight formatpainter axupimgs"
-    }
+                table image media charmap hr pagebreak insertdatetime print preview | code selectall searchreplace visualblocks | indent2em lineheight formatpainter axupimgs",
+    },
   },
   data() {
     return {
@@ -113,23 +118,28 @@ export default {
         // images_upload_base_path: '/demo',  //相对基本路径--关于图片上传建议查看--http://tinymce.ax-z.cn/general/upload-images.php
         paste_data_images: true, //图片是否可粘贴
         images_upload_handler: (blobInfo, success, failure) => {
-          console.log(3);
           if (blobInfo.blob().size / 1024 / 1024 > 2) {
             failure("上传失败，图片大小请控制在 2M 以内");
-            console.log(2);
           } else {
+            const fileType = blobInfo.blob().name.split(".").pop();
             let params = new FormData();
             params.append("file", blobInfo.blob());
-            let config = {
-              headers: {
-                "Content-Type": "multipart/form-data"
-              }
-            };
-            console.log(1);
-
-            success(
-              "https://imzujuan.xkw.com/Answer/12932998/13/843/14/28/4d53616922f949054f276462722592ec?enVqdWFu=eyJ1c2VySWQiOiI1MzQ5MDkyOSIsInVzZXJfdG9rZW4iOiI0ajU4aDk1YTFIIn0%3d"
-            );
+            params.append("filename", new Date().getTime() + "." + fileType);
+            params.append("stempic", 1);
+            // let config = {
+            //   headers: {
+            //     "Content-Type": "multipart/form-data",
+            //   },
+            // };
+            // success(
+            //   "https://imzujuan.xkw.com/Answer/12932998/13/843/14/28/4d53616922f949054f276462722592ec?enVqdWFu=eyJ1c2VySWQiOiI1MzQ5MDkyOSIsInVzZXJfdG9rZW4iOiI0ajU4aDk1YTFIIn0%3d"
+            // );
+            this.$request.fetchExamUpload(params).then((res) => {
+              console.log(res);
+              success(
+                "https://imzujuan.xkw.com/Answer/12932998/13/843/14/28/4d53616922f949054f276462722592ec?enVqdWFu=eyJ1c2VySWQiOiI1MzQ5MDkyOSIsInVzZXJfdG9rZW4iOiI0ajU4aDk1YTFIIn0%3d"
+              );
+            });
             // this.$axios
             //   .post(`${api.baseUrl}/api-upload/uploadimg`, params, config)
             //   .then(res => {
@@ -143,9 +153,9 @@ export default {
             //     failure("上传出错，服务器开小差了呢");
             //   });
           }
-        }
+        },
       },
-      contentValue: this.value
+      contentValue: this.value,
     };
   },
   watch: {
@@ -154,7 +164,7 @@ export default {
     },
     contentValue(newValue) {
       this.$emit("input", newValue);
-    }
+    },
   },
   created() {},
   mounted() {
@@ -168,8 +178,8 @@ export default {
     //清空内容
     clear() {
       this.contentValue = "";
-    }
-  }
+    },
+  },
 };
 </script>
 

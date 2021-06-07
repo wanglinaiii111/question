@@ -20,20 +20,35 @@
         <div class="tree">
           <el-tree
             :props="props"
+            :data="tData"
             :load="loadNode"
             lazy
             highlight-current
             @node-click="handleClickNode"
+            ref="my-tree"
+            node-key="tree_id"
           ></el-tree>
         </div>
       </div>
       <div class="right" v-loading.lock="fullscreenLoading">
         <div class="tools">
-          <el-radio-group v-model="libType" @change="changeLibType">
+          <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="题库类型">
+              <el-radio-group v-model="form.libType" @change="changeLibType">
+                <el-radio :label="1">公共题库</el-radio>
+                <el-radio :label="2">推荐题库</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="试题文本">
+              <el-input v-model="form.text" size="medium"></el-input>
+            </el-form-item>
+          </el-form>
+          <!-- <el-radio-group v-model="libType" @change="changeLibType">
             <el-radio :label="1">公共题库</el-radio>
             <el-radio :label="2">推荐题库</el-radio>
-          </el-radio-group>
+          </el-radio-group> -->
           <div class="btns">
+            <el-button size="medium" @click="search()">查询</el-button>
             <el-button size="medium" @click="toEdit('add')">新建试题</el-button>
           </div>
         </div>
@@ -51,9 +66,19 @@
               <span>{{ item.update_time }}</span>
             </div>
             <div class="toolBtn">
-              <el-button class="addBtn" size="mini" @click="toEdit('update',item)">更新</el-button>
-              <el-popconfirm title="确定删除这道题吗？" @confirm="deleteQues(item.id)">
-                <el-button slot="reference" size="mini" type="danger">删除</el-button>
+              <el-button
+                class="addBtn"
+                size="mini"
+                @click="toEdit('update', item)"
+                >更新</el-button
+              >
+              <el-popconfirm
+                title="确定删除这道题吗？"
+                @confirm="deleteQues(item.id)"
+              >
+                <el-button slot="reference" size="mini" type="danger"
+                  >删除</el-button
+                >
               </el-popconfirm>
             </div>
           </div>
@@ -66,10 +91,13 @@
                   <el-button slot="reference" size="mini" type="danger">删除</el-button>
                 </el-popconfirm>
               </div>-->
-              <span v-html=" HtmlUtil.htmlDecodeByRegExp(item.stem)"></span>
+              <span v-html="HtmlUtil.htmlDecodeByRegExp(item.stem)"></span>
             </div>
             <img v-if="isImage(item.answer)" :src="item.answer" alt />
-            <span v-else v-html=" HtmlUtil.htmlDecodeByRegExp(item.answer)"></span>
+            <span
+              v-else
+              v-html="HtmlUtil.htmlDecodeByRegExp(item.answer)"
+            ></span>
           </div>
         </el-card>
       </div>
@@ -84,7 +112,7 @@ import { HtmlUtil } from "../utils/htmlEncode";
 export default {
   name: "question",
   components: {
-    AddQuestion: addQuestion
+    AddQuestion: addQuestion,
   },
   data() {
     return {
@@ -98,32 +126,52 @@ export default {
         isLeaf: (data, node) => {
           // is_have_childe 1有子节点 0没有子节点
           return data.is_have_childe === 0 ? true : false;
-        }
+        },
       },
+      tData: [],
       resolve: null,
+      root: null,
       keyword: "",
-      libType: 1,
-      curQues: null
+      form: {
+        libType: 1,
+        text: "",
+      },
+      curQues: null,
+      parentNodes: [],
     };
   },
   mounted() {
     this.getSubjectList();
+  },
+  beforeRouteLeave(to, from, next) {
+    this.$store.dispatch("setQuestionLevel", "list");
+    next();
   },
   methods: {
     getKnowledgeNode(id) {
       this.$request
         .fetchKnowledgeNode({
           parentid: id,
-          subjectid: this.subject_id
+          subjectid: this.subject_id,
         })
-        .then(res => {
+        .then((res) => {
           this.resolve(res.data);
           if (id === 0) {
+            this.tData = res.data;
+            if (res.data.length == 0) {
+              this.questionList = [];
+              return;
+            }
+            let tree = this.$refs["my-tree"];
             this.keyword = res.data[0].name;
+            this.$nextTick(() => {
+              tree.setCurrentKey(res.data[0].tree_id);
+            });
+            this.getTreeNode(tree.getNode(res.data[0].tree_id));
             this.getQuestion();
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -132,17 +180,17 @@ export default {
       this.fullscreenLoading = true;
       this.$request
         .fetchQuestion({
-          libtype: this.libType,
+          libtype: this.form.libType,
           keyword: this.keyword,
-          subject_id: this.subject_id
+          subject_id: this.subject_id,
         })
-        .then(res => {
+        .then((res) => {
           this.questionList = res.data;
           this.fullscreenLoading = false;
         });
     },
     getSubjectList() {
-      this.$request.fetchSelectSubject({}).then(res => {
+      this.$request.fetchSelectSubject({}).then((res) => {
         this.allSubjectList = res.data;
       });
     },
@@ -150,6 +198,7 @@ export default {
       console.log(node, "node");
 
       if (node.level === 0) {
+        this.root = node;
         this.getKnowledgeNode(0);
       } else {
         if (node.data.is_have_childe === 0) return;
@@ -160,15 +209,29 @@ export default {
     },
     changeSubject(val) {
       this.subject_id = val;
-      this.getKnowledgeNode(0);
+      // this.getKnowledgeNode(0);
+      this.loadNode(this.root, this.resolve);
     },
     handleClickNode(data, node, vue) {
-      console.log(data, node);
+      this.parentNodes.length = 0;
+      this.form.text = "";
+      this.getTreeNode(node);
       this.keyword = data.name;
       this.getQuestion();
     },
+    getTreeNode(node) {
+      //获取当前树节点和其父级节点
+      if (node) {
+        if (node.data.parent_id !== undefined) {
+          this.parentNodes.unshift(node.data.name); //在数组头部添加元素
+          if (node.data.parent_id !== 0) {
+            this.getTreeNode(node.parent); //递归
+          }
+        }
+      }
+    },
     changeLibType(val) {
-      this.libType = val;
+      this.form.libType = val;
       this.getQuestion();
     },
     isImage(str) {
@@ -177,21 +240,21 @@ export default {
     },
     deleteQues(id) {
       this.$request
-        .fetchDelQuestion({ id: id, libtype: this.libType })
-        .then(res => {
+        .fetchDelQuestion({ id: id, libtype: this.form.libType })
+        .then((res) => {
           this.getQuestion();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success"
+            type: "success",
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "删除失败！",
-            type: "error"
+            type: "error",
           });
         });
     },
@@ -200,13 +263,29 @@ export default {
       if (type === "update") {
         this.curQues = {
           ...data,
-          libType: this.libType,
-          subject_id: this.subject_id
+          libType: this.form.libType,
+          subject_id: this.subject_id,
+          parentNodes: this.parentNodes,
         };
       }
       this.$store.dispatch("setQuestionLevel", type);
-    }
-  }
+    },
+    search() {
+      //搜索
+      this.fullscreenLoading = true;
+      this.$request
+        .fetchMatchingQuestion({
+          libtype: this.form.libType,
+          text: this.form.text,
+          subject_id: this.subject_id,
+        })
+        .then((res) => {
+          this.$refs["my-tree"].setCurrentKey(null);
+          this.questionList = res.data;
+          this.fullscreenLoading = false;
+        });
+    },
+  },
 };
 </script>
 

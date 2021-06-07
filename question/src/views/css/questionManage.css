@@ -1,6 +1,6 @@
-.ques{
+.ques {
     width: 100%;
-    height: 100%; 
+    height: 100%;
 }
 
 .container {
@@ -58,12 +58,12 @@
     margin-bottom: 10px;
 }
 
-.btns{
+.btns {
     margin-top: 10px;
     text-align: right;
 }
 
-.cardContainer{
+.cardContainer {
     width: 100%;
     height: 100%;
 }
@@ -85,7 +85,11 @@
     font-size: 14px;
 }
 
-.toolBtn{
+.toolBtn {
     text-align: right;
     margin-top: 10px;
+}
+
+.tools .el-form-item {
+    margin-bottom: 10px;
 }
