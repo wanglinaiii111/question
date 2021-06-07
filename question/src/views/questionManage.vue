@@ -49,7 +49,12 @@
           </el-radio-group> -->
           <div class="btns">
             <el-button size="medium" @click="search()">查询</el-button>
-            <el-button size="medium" @click="toEdit('add')">新建试题</el-button>
+            <el-button
+              v-if="$store.getters.info.role === 'superAdmin'"
+              size="medium"
+              @click="toEdit('add')"
+              >新建试题</el-button
+            >
           </div>
         </div>
         <el-card class="box-card" v-for="item in questionList" :key="item.id">
@@ -65,7 +70,10 @@
               <el-divider direction="vertical"></el-divider>
               <span>{{ item.update_time }}</span>
             </div>
-            <div class="toolBtn">
+            <div
+              class="toolBtn"
+              v-if="$store.getters.info.role === 'superAdmin'"
+            >
               <el-button
                 class="addBtn"
                 size="mini"
@@ -209,7 +217,6 @@ export default {
     },
     changeSubject(val) {
       this.subject_id = val;
-      // this.getKnowledgeNode(0);
       this.loadNode(this.root, this.resolve);
     },
     handleClickNode(data, node, vue) {

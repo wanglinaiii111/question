@@ -16,6 +16,7 @@ const en = {
     classReport: "classReport",
     download: "download",
     questionManage: "questionManage",
+    nouploadExam:'nouploadExam',
 
     home: "home",
     article: "article",

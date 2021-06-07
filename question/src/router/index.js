@@ -36,6 +36,7 @@ const subjectList = () => import("@/views/subjectList");
 const classReport = () => import("@/views/classReport");
 const download = () => import("@/views/download");
 const questionManage = () => import("@/views/questionManage");
+const nouploadExam = () => import("@/views/nouploadExam");
 
 /**
  * 重写路由的push方法
@@ -94,6 +95,23 @@ let addRouter = [
         iconCls: "fa fa-book", // 图标样式class
         name: "questionManage",
         component: questionManage,
+        children: []
+      }
+    ]
+  },
+  {
+    path: "/nouploadExam",
+    iconCls: "fa fa-list-ul", // 图标样式class
+    name: routeName.nouploadExam,
+    meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
+    component: Layout,
+    alone: true,
+    children: [
+      {
+        path: "/nouploadExam",
+        iconCls: "fa fa-list-ul", // 图标样式class
+        name: "nouploadExam",
+        component: nouploadExam,
         children: []
       }
     ]

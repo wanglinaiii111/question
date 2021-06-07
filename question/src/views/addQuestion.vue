@@ -1,7 +1,6 @@
 <template>
   <div class="addQues">
     <el-button size="medium" @click="back">返回上一级</el-button>
-    <img src="http://localhost:8002/exam/download?filename=1623050330473.png&stempic=1&answerpic=''" alt="">
     <div class="formContainer">
       <h1 class="quesTitle">
         {{ $store.getters.questionLevel === "add" ? "创建试题" : "更新试题" }}

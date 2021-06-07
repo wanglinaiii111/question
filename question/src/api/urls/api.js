@@ -40,6 +40,8 @@ let api = {
   createExamsubject: "exam/createExamsubject",
   //查询某次考试所有考试科目 GET
   selectExamsubject: "exam/select/examsubject",
+  //查询还没有上传到公共题库的考试记录(题库录入模块) get
+  selectExamNoUpload: "exam/select/noupload",
   //上传考试 班级成绩单 GET （上传的是某个班级的考试成绩表格）
   createGradereport: "exam/create/gradereport",
   delGradereport: "exam/delete/gradereport",

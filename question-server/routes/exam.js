@@ -58,6 +58,12 @@ router.get('/select/gradereport', async function (req, res, next) {
     res.send(result);
 });
 
+router.get('/select/noupload', async function (req, res, next) {
+    let p = req.query;
+    let result = await examDao.notUploadExam(p);
+    res.send(result);
+});
+
 router.post('/file/upload', multipartMiddleware, (req, res, next) => {
     const formData = new FormData();
     const params = req.body;

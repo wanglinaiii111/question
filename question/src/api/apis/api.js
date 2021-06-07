@@ -104,6 +104,12 @@ export default {
       params: data
     });
   },
+  //查询还没有上传到公共题库的考试记录(题库录入模块) get
+  fetchSelectExamNoUpload(data) {
+    return axios.get(apiUrls.selectExamNoUpload, {
+      params: data
+    });
+  },
   //上传考试 班级成绩单 GET （上传的是某个班级的考试成绩表格）
   fetchCreateGradereport(data) {
     return axios.get(apiUrls.createGradereport, {

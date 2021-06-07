@@ -3,6 +3,9 @@
 3、http://localhost:8081/api/class/select?level=2021&headteacher=%E6%95%99%E5%B8%881 
     查询班级接口 搜索“教师1”报500
 
+4、试题上传接口报500
+5、图片上传接口需要把图片url返回
+
 
 /****
 1、root用户可增删改查其他用户权限

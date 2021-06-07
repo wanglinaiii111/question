@@ -73,6 +73,14 @@ async function examUpload(param) {
   });
 }
 
+async function notUploadExam(param) {
+  return await common.service({
+    url: config.api_url + '/exam/select/noupload',
+    method: 'get',
+    params: param,
+  });
+}
+
 module.exports = {
   create,
   select,
@@ -83,4 +91,5 @@ module.exports = {
   delGradeReport,
   selectGradeReport,
   examUpload,
+  notUploadExam,
 };
