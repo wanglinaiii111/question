@@ -293,7 +293,7 @@ export default {
           qtype: this.form.qtype,
           difficulty: this.form.difficulty,
           nums: "0",
-          qno: new Date().getTime(),
+          qno: this.form.qno,
           stem: HtmlUtil.htmlEncodeByRegExp(this.form.stem),
           source: this.form.source,
           points: len > 1 ? this.form.points[len - 1] : this.form.points[0],
@@ -304,7 +304,6 @@ export default {
         })
         .then((res) => {
           if (res.data.result) {
-            this.$store.dispatch("setQuestionLevel", "list");
             this.$message({
               showClose: true,
               message: "更新成功！",
