@@ -14,8 +14,9 @@ const cn = {
     subjectList: "科目列表",
     classReport: "成绩单",
     download: "文件下载",
-    questionManage: "题库管理",
-    nouploadExam: "未上传题库记录"
+    question: "题库管理",
+    questionManage: "试题列表",
+    nouploadExam: "未上传记录"
   },
   rightMenu: {
     close: "关闭",

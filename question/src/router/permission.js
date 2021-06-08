@@ -96,7 +96,7 @@ router.beforeEach((to, from, next) => {
       // todo 访问无权访问的菜单，跳转404
       let is404 = to.matched.some(record => {
         if (record.meta.role) {
-          return store.getters.info.role === -1;
+          return record.meta.role.indexOf(store.getters.info.role) === -1;
         }
       });
       if (is404) {
@@ -111,4 +111,3 @@ router.beforeEach((to, from, next) => {
 router.afterEach(() => {
   NProgress.done();
 });
-

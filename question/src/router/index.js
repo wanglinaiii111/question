@@ -82,37 +82,62 @@ let defaultRouter = [
 ];
 
 let addRouter = [
+  // {
+  //   path: "/questionManage",
+  //   iconCls: "fa fa-book", // 图标样式class
+  //   name: routeName.questionManage,
+  //   meta: { role: ["superAdmin", "admin"], isShowTabNav: true },
+  //   component: Layout,
+  //   alone: true,
+  //   children: [
+  //     {
+  //       path: "/questionManage",
+  //       iconCls: "fa fa-book", // 图标样式class
+  //       name: "questionManage",
+  //       component: questionManage,
+  //       children: []
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: "/nouploadExam",
+  //   iconCls: "fa fa-list-ul", // 图标样式class
+  //   name: routeName.nouploadExam,
+  //   meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
+  //   component: Layout,
+  //   alone: true,
+  //   children: [
+  //     {
+  //       path: "/nouploadExam",
+  //       iconCls: "fa fa-list-ul", // 图标样式class
+  //       name: "nouploadExam",
+  //       component: nouploadExam,
+  //       children: []
+  //     }
+  //   ]
+  // },
   {
-    path: "/questionManage",
+    path: "/",
     iconCls: "fa fa-book", // 图标样式class
-    name: routeName.questionManage,
+    name: routeName.question,
     meta: { role: ["superAdmin", "admin"], isShowTabNav: true },
     component: Layout,
-    alone: true,
     children: [
       {
         path: "/questionManage",
-        iconCls: "fa fa-book", // 图标样式class
-        name: "questionManage",
+        iconCls: "fa fa-list-alt", // 图标样式class
+        name: routeName.questionManage,
         component: questionManage,
-        children: []
-      }
-    ]
-  },
-  {
-    path: "/nouploadExam",
-    iconCls: "fa fa-list-ul", // 图标样式class
-    name: routeName.nouploadExam,
-    meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
-    component: Layout,
-    alone: true,
-    children: [
+        children: [],
+        meta: { role: ["superAdmin", "admin"], isShowTabNav: true }
+      },
       {
         path: "/nouploadExam",
         iconCls: "fa fa-list-ul", // 图标样式class
-        name: "nouploadExam",
+        name: routeName.nouploadExam,
         component: nouploadExam,
-        children: []
+        children: [],
+        meta: { role: ["superAdmin", "admin"], isShowTabNav: true }
       }
     ]
   },

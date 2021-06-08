@@ -15,6 +15,7 @@ const en = {
     subjectList: "subjectList",
     classReport: "classReport",
     download: "download",
+    question: "question",
     questionManage: "questionManage",
     nouploadExam:'nouploadExam',
 

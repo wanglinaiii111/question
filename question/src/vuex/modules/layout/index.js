@@ -18,14 +18,14 @@ export default {
       }
     ],
     examLevel: "exam",
-    questionLevel: 'list'
+    questionLevel: "list"
   },
   mutations: {
     addTab(state, arg) {
       let curR = [...addRouter, ...defaultRouter].find(
         item => item.name === arg.title
       );
-      if (!curR.meta || !curR.meta.isShowTabNav) {
+      if (curR && (!curR.meta || !curR.meta.isShowTabNav)) {
         return;
       }
       state.isActive = arg.path;
@@ -52,7 +52,7 @@ export default {
       state.rightNav = arg;
     },
     removeTab(state, arg) {
-      let index = state.tabnavBox.findIndex(function (value, key) {
+      let index = state.tabnavBox.findIndex(function(value, key) {
         return value.path === arg.tabItem.path;
       });
       state.tabnavBox.splice(index, 1);
@@ -80,7 +80,7 @@ export default {
     collapse(state, arg) {
       state.isCollapse = !state.isCollapse;
       if (state.logoShow) {
-        setTimeout(function () {
+        setTimeout(function() {
           state.logoShow = false;
         }, 300);
       } else {
