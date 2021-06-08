@@ -28,7 +28,7 @@ router.post('/update', async function (req, res, next) {
   res.send(result);
 });
 
-router.post('/del', async function (req, res, next) {
+router.get('/del', async function (req, res, next) {
   let p = req.query;
   let result = await questionDao.del(p);
   res.send(result);

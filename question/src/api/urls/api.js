@@ -55,9 +55,10 @@ let api = {
   addQuestion: "question/add",
   delQuestion: "question/del",
   updateQuestion: "question/update",
-  matchingQuestion: "question/matching",
+  matchingQuestion: "question/matching"
 };
 for (const key in api) {
   api[key] = url + api[key];
 }
 export default api;
+export { url };

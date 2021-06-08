@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { url } from "../api/urls/api";
 //引入tinymce编辑器
 import Editor from "@tinymce/tinymce-vue";
 
@@ -64,6 +65,9 @@ export default {
     Editor,
   },
   props: {
+    editType: {
+      type: String,
+    },
     value: {
       type: String,
       default: "",
@@ -122,36 +126,29 @@ export default {
             failure("上传失败，图片大小请控制在 2M 以内");
           } else {
             const fileType = blobInfo.blob().name.split(".").pop();
+            const filename = new Date().getTime() + "." + fileType;
             let params = new FormData();
             params.append("file", blobInfo.blob());
-            params.append("filename", new Date().getTime() + "." + fileType);
-            params.append("stempic", 1);
+            params.append("filename", filename);
+            params.append("stempic", this.editType === "stem" ? 1 : "");
+            params.append("answerpic", this.editType === "answer" ? 1 : "");
             // let config = {
             //   headers: {
             //     "Content-Type": "multipart/form-data",
             //   },
             // };
-            // success(
-            //   "https://imzujuan.xkw.com/Answer/12932998/13/843/14/28/4d53616922f949054f276462722592ec?enVqdWFu=eyJ1c2VySWQiOiI1MzQ5MDkyOSIsInVzZXJfdG9rZW4iOiI0ajU4aDk1YTFIIn0%3d"
-            // );
             this.$request.fetchExamUpload(params).then((res) => {
-              console.log(res);
-              success(
-                "https://imzujuan.xkw.com/Answer/12932998/13/843/14/28/4d53616922f949054f276462722592ec?enVqdWFu=eyJ1c2VySWQiOiI1MzQ5MDkyOSIsInVzZXJfdG9rZW4iOiI0ajU4aDk1YTFIIn0%3d"
-              );
+              if (res.data.desc === "文件上传成功!") {
+                this.$message.success(res.data.desc);
+                success(
+                  `${url}exam/download?filename=${filename}&stempic=${
+                    this.editType === "stem" ? 1 : ""
+                  }&answerpic=${this.editType === "answer" ? 1 : ""}`
+                );
+                return;
+              }
+              failure("上传失败");
             });
-            // this.$axios
-            //   .post(`${api.baseUrl}/api-upload/uploadimg`, params, config)
-            //   .then(res => {
-            //     if (res.data.code == 200) {
-            //       success(res.data.msg); //上传成功，在成功函数里填入图片路径
-            //     } else {
-            //       failure("上传失败");
-            //     }
-            //   })
-            //   .catch(() => {
-            //     failure("上传出错，服务器开小差了呢");
-            //   });
           }
         },
       },

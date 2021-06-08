@@ -1,6 +1,6 @@
 <template>
   <div class="addQues">
-    <el-button size="medium" @click="back">返回上一级</el-button>
+    <el-button size="medium" @click="confirmBack">返回上一级</el-button>
     <div class="formContainer">
       <h1 class="quesTitle">
         {{ $store.getters.questionLevel === "add" ? "创建试题" : "更新试题" }}
@@ -50,13 +50,14 @@
             :show-all-levels="false"
             @change="changePoint"
             size="medium"
+            :key="form.subject_id"
           ></el-cascader>
         </el-form-item>
         <el-form-item label="题干">
-          <TEditor ref="editor" v-model="form.stem" />
+          <TEditor ref="editor" v-model="form.stem" editType="stem" />
         </el-form-item>
         <el-form-item label="答案">
-          <TEditor ref="editor" v-model="form.answer" />
+          <TEditor ref="editor" v-model="form.answer" editType="answer" />
         </el-form-item>
         <el-form-item label="考试题">
           <el-radio-group v-model="form.isExam" @change="changeIsExam">
@@ -84,16 +85,9 @@
           <el-button v-else type="primary" @click="onSubmitUpdate"
             >更新</el-button
           >
-          <el-button @click="back">取消</el-button>
+          <el-button @click="confirmBack">取消</el-button>
         </el-form-item>
       </el-form>
-      <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
-        <span>当前的编辑尚未保存，是否继续返回？</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmBack()">确 定</el-button>
-        </span>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -106,7 +100,6 @@ export default {
   data() {
     let that = this;
     return {
-      dialogVisible: false,
       HtmlUtil: HtmlUtil,
       allSubjectList: [],
       resolve: null,
@@ -150,7 +143,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this.updateData);
     if (this.updateData) {
       this.form = {
         ...this.updateData,
@@ -230,12 +222,9 @@ export default {
       this.form.isExam = val;
     },
     changePoint(val) {
-      console.log(val);
-      // this.form.points = val[val.length - 1];
       this.form.points = val;
     },
     changeExamId(val) {
-      console.log(val);
       this.form.exam_detail_id = val[val.length - 1];
     },
     onSubmit() {
@@ -274,7 +263,7 @@ export default {
         })
         .then((res) => {
           if (res.data.result) {
-            this.$store.dis;
+            this.$store.dispatch("setQuestionLevel", "list");
             this.$message({
               showClose: true,
               message: "创建成功！",
@@ -297,6 +286,7 @@ export default {
     },
     onSubmitUpdate() {
       //更新
+      const len = this.form.points.length;
       this.$request
         .fetchUpdateQuestion({
           libtype: this.form.libType,
@@ -306,7 +296,7 @@ export default {
           qno: new Date().getTime(),
           stem: HtmlUtil.htmlEncodeByRegExp(this.form.stem),
           source: this.form.source,
-          points: this.form.points,
+          points: len > 1 ? this.form.points[len - 1] : this.form.points[0],
           answer: HtmlUtil.htmlEncodeByRegExp(this.form.answer),
           exam_detail_id:
             this.form.isExam === 1 ? this.form.exam_detail_id : "",
@@ -314,7 +304,7 @@ export default {
         })
         .then((res) => {
           if (res.data.result) {
-            this.$store.dis;
+            this.$store.dispatch("setQuestionLevel", "list");
             this.$message({
               showClose: true,
               message: "更新成功！",
@@ -335,12 +325,8 @@ export default {
           console.log(error);
         });
     },
-    back() {
-      this.dialogVisible = true;
-    },
     confirmBack() {
       this.$store.dispatch("setQuestionLevel", "list");
-      this.dialogVisible = false;
     },
     isImage(str) {
       if (!str) return;
