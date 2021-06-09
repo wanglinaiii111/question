@@ -1,6 +1,11 @@
 <template>
   <div class="ques">
-    <div class="container" :style="{display:$store.getters.questionLevel === 'list'?'flex':'none'}">
+    <div
+      class="container"
+      :style="{
+        display: $store.getters.questionLevel === 'list' ? 'flex' : 'none',
+      }"
+    >
       <div class="left">
         <el-select
           v-model="subject_id"
@@ -53,26 +58,62 @@
               v-if="$store.getters.info.role === 'superAdmin'"
               size="medium"
               @click="toEdit('add')"
-            >新建试题</el-button>
+              >新建试题</el-button
+            >
           </div>
         </div>
         <el-card class="box-card" v-for="item in questionList" :key="item.id">
           <div slot="header" class="clearfix">
             <div>
-              <span>{{ item.qtype }}</span>
+              <span>{{
+                item.qtype.indexOf("题型") !== -1
+                  ? item.qtype
+                  : "题型：" + item.qtype
+              }}</span>
               <el-divider direction="vertical"></el-divider>
               <span>{{ item.source }}</span>
               <el-divider direction="vertical"></el-divider>
-              <span>{{ item.difficulty }}</span>
+              <span>
+                {{
+                  item.difficulty.indexOf("难度") !== -1
+                    ? item.difficulty
+                    : "难度：" + item.difficulty
+                }}
+              </span>
               <el-divider direction="vertical"></el-divider>
-              <span>{{ item.nums }}</span>
+              <span>
+                {{
+                  item.nums.indexOf("引用次数") !== -1
+                    ? item.nums
+                    : "引用次数：" + item.nums
+                }}
+              </span>
               <el-divider direction="vertical"></el-divider>
-              <span>{{ item.update_time }}</span>
+              <span>
+                {{
+                  item.update_time.indexOf("更新时间") !== -1
+                    ? item.update_time
+                    : "更新时间：" + item.update_time
+                }}
+              </span>
             </div>
-            <div class="toolBtn" v-if="$store.getters.info.role === 'superAdmin'">
-              <el-button class="addBtn" size="mini" @click="toEdit('update', item)">更新</el-button>
-              <el-popconfirm title="确定删除这道题吗？" @confirm="deleteQues(item.id)">
-                <el-button slot="reference" size="mini" type="danger">删除</el-button>
+            <div
+              class="toolBtn"
+              v-if="$store.getters.info.role === 'superAdmin'"
+            >
+              <el-button
+                class="addBtn"
+                size="mini"
+                @click="toEdit('update', item)"
+                >更新</el-button
+              >
+              <el-popconfirm
+                title="确定删除这道题吗？"
+                @confirm="deleteQues(item.id)"
+              >
+                <el-button slot="reference" size="mini" type="danger"
+                  >删除</el-button
+                >
               </el-popconfirm>
             </div>
           </div>
@@ -87,26 +128,44 @@
               </div>-->
               <span v-html="HtmlUtil.htmlDecodeByRegExp(item.stem)"></span>
             </div>
-            <img v-if="isImage(item.answer)" :src="item.answer" alt />
-            <span v-else v-html="HtmlUtil.htmlDecodeByRegExp(item.answer)"></span>
+            <img
+              v-if="isImage(item.answer)"
+              :src="
+                url +
+                'exam/download?filename=' +
+                item.qno.substring(3) +
+                '.png' +
+                '&answerpic=1&stempic='
+              "
+              alt
+            />
+            <span
+              v-else
+              v-html="HtmlUtil.htmlDecodeByRegExp(item.answer)"
+            ></span>
           </div>
         </el-card>
       </div>
     </div>
-    <AddQuestion v-if="$store.getters.questionLevel !== 'list'" :updateData="curQues"></AddQuestion>
+    <AddQuestion
+      v-if="$store.getters.questionLevel !== 'list'"
+      :updateData="curQues"
+    ></AddQuestion>
   </div>
 </template>
 
 <script>
 import addQuestion from "./addQuestion";
 import { HtmlUtil } from "../utils/htmlEncode";
+import { url } from "../api/urls/api";
 export default {
   name: "question",
   components: {
-    AddQuestion: addQuestion
+    AddQuestion: addQuestion,
   },
   data() {
     return {
+      url: url,
       fullscreenLoading: false,
       HtmlUtil: HtmlUtil,
       subject_id: "4",
@@ -117,7 +176,7 @@ export default {
         isLeaf: (data, node) => {
           // is_have_childe 1有子节点 0没有子节点
           return data.is_have_childe === 0 ? true : false;
-        }
+        },
       },
       tData: [],
       resolve: null,
@@ -125,25 +184,25 @@ export default {
       keyword: "",
       form: {
         libType: 1,
-        text: ""
+        text: "",
       },
       curQues: null,
-      parentNodes: []
+      parentNodes: [],
     };
   },
   computed: {
     questionLevel() {
       return this.$store.getters.questionLevel;
-    }
+    },
   },
   watch: {
     questionLevel(n, m) {
       console.log(n);
-      
+
       if (n === "list") {
         this.getQuestion();
       }
-    }
+    },
   },
   mounted() {
     this.getSubjectList();
@@ -157,9 +216,9 @@ export default {
       this.$request
         .fetchKnowledgeNode({
           parentid: id,
-          subjectid: this.subject_id
+          subjectid: this.subject_id,
         })
-        .then(res => {
+        .then((res) => {
           this.resolve(res.data);
           if (id === 0) {
             this.tData = res.data;
@@ -176,7 +235,7 @@ export default {
             this.getQuestion();
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
     },
@@ -187,15 +246,15 @@ export default {
         .fetchQuestion({
           libtype: this.form.libType,
           keyword: this.keyword,
-          subject_id: this.subject_id
+          subject_id: this.subject_id,
         })
-        .then(res => {
+        .then((res) => {
           this.questionList = res.data;
           this.fullscreenLoading = false;
         });
     },
     getSubjectList() {
-      this.$request.fetchSelectSubject({}).then(res => {
+      this.$request.fetchSelectSubject({}).then((res) => {
         this.allSubjectList = res.data;
       });
     },
@@ -245,20 +304,20 @@ export default {
     deleteQues(id) {
       this.$request
         .fetchDelQuestion({ id: id, libtype: this.form.libType })
-        .then(res => {
+        .then((res) => {
           this.getQuestion();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success"
+            type: "success",
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "删除失败！",
-            type: "error"
+            type: "error",
           });
         });
     },
@@ -269,7 +328,7 @@ export default {
           ...data,
           libType: this.form.libType,
           subject_id: this.subject_id,
-          parentNodes: this.parentNodes
+          parentNodes: this.parentNodes,
         };
       }
       this.$store.dispatch("setQuestionLevel", type);
@@ -281,15 +340,15 @@ export default {
         .fetchMatchingQuestion({
           libtype: this.form.libType,
           text: this.form.text,
-          subject_id: this.subject_id
+          subject_id: this.subject_id,
         })
-        .then(res => {
+        .then((res) => {
           this.$refs["my-tree"].setCurrentKey(null);
           this.questionList = res.data;
           this.fullscreenLoading = false;
         });
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -65,6 +65,9 @@ export default {
     Editor,
   },
   props: {
+    time: {
+      type: Number,
+    },
     editType: {
       type: String,
     },
@@ -132,7 +135,10 @@ export default {
             failure("上传失败，图片大小请控制在 2M 以内");
           } else {
             const fileType = blobInfo.blob().name.split(".").pop();
-            const filename = new Date().getTime() + "." + fileType;
+            let filename = new Date().getTime() + "." + fileType;
+            if (this.editType === "answer") {
+              filename = `${this.time}__${new Date().getTime()}.${fileType}`;
+            }
             let params = new FormData();
             params.append("file", blobInfo.blob());
             params.append("filename", filename);
@@ -171,7 +177,7 @@ export default {
   },
   created() {},
   mounted() {
-    tinymce.init({menubar: false,});
+    tinymce.init({});
   },
   methods: {
     // 添加相关的事件，可用的事件参照文档=> https://github.com/tinymce/tinymce-vue => All available events

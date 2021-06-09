@@ -57,7 +57,12 @@
           <TEditor ref="editor" v-model="form.stem" editType="stem" />
         </el-form-item>
         <el-form-item label="答案">
-          <TEditor ref="editor" v-model="form.answer" editType="answer" />
+          <TEditor
+            ref="editor"
+            v-model="form.answer"
+            editType="answer"
+            :time="time"
+          />
         </el-form-item>
         <el-form-item label="考试题">
           <el-radio-group v-model="form.isExam" @change="changeIsExam">
@@ -65,9 +70,17 @@
             <el-radio :label="0">否</el-radio>
           </el-radio-group>
           <div>
-            <el-cascader
+            <!-- <el-cascader
               v-if="form.isExam === 1"
               :props="examProps"
+              v-model="form.exam_detail_id"
+              :show-all-levels="false"
+              @change="changeExamId"
+              size="medium"
+            ></el-cascader> -->
+            <el-cascader
+              v-if="form.isExam === 1"
+              :options="options"
               v-model="form.exam_detail_id"
               :show-all-levels="false"
               @change="changeExamId"
@@ -94,6 +107,7 @@
 
 <script>
 import { HtmlUtil } from "../utils/htmlEncode";
+import { url } from "../api/urls/api";
 export default {
   name: "add-question",
   props: ["updateData"],
@@ -104,6 +118,7 @@ export default {
       allSubjectList: [],
       resolve: null,
       resolve_exam: null,
+      time: new Date().getTime(),
       form: {
         libType: 1,
         qtype: "",
@@ -129,20 +144,22 @@ export default {
           }
         },
       },
-      examProps: {
-        lazy: true,
-        lazyLoad(node, resolve) {
-          that.resolve_exam = resolve;
-          if (node.level === 0) {
-            that.getExamList();
-          } else {
-            that.getExam_subjectList(node.data.value);
-          }
-        },
-      },
+      // examProps: {
+      //   lazy: true,
+      //   lazyLoad(node, resolve) {
+      //     that.resolve_exam = resolve;
+      //     if (node.level === 0) {
+      //       that.getExamList();
+      //     } else {
+      //       that.getExam_subjectList(node.data.value);
+      //     }
+      //   },
+      // },
+      options: [],
     };
   },
   mounted() {
+    console.log(this.updateData);
     if (this.updateData) {
       this.form = {
         ...this.updateData,
@@ -150,11 +167,17 @@ export default {
         isExam: this.updateData.exam_detail_id ? 1 : 0,
         stem: HtmlUtil.htmlDecodeByRegExp(this.updateData.stem),
         answer: this.isImage(this.updateData.answer)
-          ? `<img src=${this.updateData.answer} alt />`
+          ? `<img src=${
+              url +
+              "exam/download?filename=" +
+              this.updateData.qno.substring(3) +
+              ".png&answerpic=1&stempic="
+            } alt />`
           : HtmlUtil.htmlDecodeByRegExp(this.updateData.answer),
       };
     }
     this.getSubjectList();
+    this.getExamList();
   },
   methods: {
     getKnowledgeNode(id) {
@@ -185,28 +208,54 @@ export default {
       this.$request
         .fetchSelectExam({})
         .then((res) => {
-          console.log(res.data.result);
-          const nodes = res.data.result.map((item) => ({
-            value: item.exam_id,
-            label: item.name,
-          }));
-          console.log(nodes);
-          this.resolve_exam(nodes);
+          // const nodes = res.data.result.map((item) => ({
+          //   value: item.exam_id,
+          //   label: item.name,
+          // }));
+          // this.resolve_exam(nodes);
+          this.options = [];
+          const result = res.data.result;
+          result.map(async (item, index) => {
+            const sub = await this.getExam_subjectList(item.exam_id);
+            this.options.push({
+              value: item.exam_id,
+              label: item.name,
+              children: [],
+            });
+            sub.map((subItem) => {
+              if (
+                this.updateData &&
+                +this.updateData.exam_detail_id === +subItem.exam_detail_id
+              ) {
+                this.form.exam_detail_id = [
+                  item.exam_id,
+                  subItem.exam_detail_id,
+                ];
+              }
+              this.options[index].children.push({
+                value: subItem.exam_detail_id,
+                label: subItem.subject_name,
+              });
+            });
+            return item;
+          });
+          console.log(this.options);
         })
         .catch((error) => {
           console.log(error);
         });
     },
     getExam_subjectList(id) {
-      this.$request
+      return this.$request
         .fetchSelectExamsubject({ exam_id: id })
         .then((res) => {
-          const nodes = res.data.map((item) => ({
-            value: item.exam_detail_id,
-            label: item.subject_name,
-            leaf: true,
-          }));
-          this.resolve_exam(nodes);
+          // const nodes = res.data.map((item) => ({
+          //   value: item.exam_detail_id,
+          //   label: item.subject_name,
+          //   leaf: true,
+          // }));
+          // this.resolve_exam(nodes);
+          return res.data;
         })
         .catch((error) => {
           console.log(error);
@@ -225,7 +274,8 @@ export default {
       this.form.points = val;
     },
     changeExamId(val) {
-      this.form.exam_detail_id = val[val.length - 1];
+      console.log(val);
+      this.form.exam_detail_id = val;
     },
     onSubmit() {
       //创建
@@ -246,19 +296,20 @@ export default {
         return this.$message.error("请为试题添加答案");
       }
       const len = this.form.points.length;
+      const len_id = this.form.exam_detail_id.length;
       this.$request
         .fetchAddQuestion({
           libtype: this.form.libType,
           qtype: this.form.qtype,
           difficulty: this.form.difficulty,
           nums: "0",
-          qno: new Date().getTime(),
+          qno: this.time,
           stem: HtmlUtil.htmlEncodeByRegExp(this.form.stem),
           source: this.form.source,
           points: len > 1 ? this.form.points[len - 1] : this.form.points[0],
           answer: HtmlUtil.htmlEncodeByRegExp(this.form.answer),
           exam_detail_id:
-            this.form.isExam === 1 ? this.form.exam_detail_id : "",
+            this.form.isExam === 1 ? this.form.exam_detail_id[len_id - 1] : "",
           subject_id: this.form.subject_id,
         })
         .then((res) => {
@@ -287,6 +338,7 @@ export default {
     onSubmitUpdate() {
       //更新
       const len = this.form.points.length;
+      const len_id = this.form.exam_detail_id.length;
       this.$request
         .fetchUpdateQuestion({
           libtype: this.form.libType,
@@ -299,7 +351,7 @@ export default {
           points: len > 1 ? this.form.points[len - 1] : this.form.points[0],
           answer: HtmlUtil.htmlEncodeByRegExp(this.form.answer),
           exam_detail_id:
-            this.form.isExam === 1 ? this.form.exam_detail_id : "",
+            this.form.isExam === 1 ? this.form.exam_detail_id[len_id - 1] : "",
           id: this.form.id,
         })
         .then((res) => {
