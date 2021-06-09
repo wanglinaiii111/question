@@ -78,15 +78,21 @@ export default {
     },
     plugins: {
       type: [String, Array],
+      // default:
+      //   "print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr nonbreaking anchor insertdatetime advlist lists wordcount textpattern autosave ",
       default:
-        "print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount textpattern autosave ",
+        "preview searchreplace autolink directionality visualblocks visualchars fullscreen image table charmap hr advlist lists wordcount textpattern ",
     },
     toolbar: {
       type: [String, Array],
+      // default:
+      //   "fullscreen undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | \
+      //           styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
+      //           table image media charmap hr pagebreak insertdatetime print preview | code selectall searchreplace visualblocks | indent2em lineheight formatpainter axupimgs",
       default:
-        "fullscreen undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright alignjustify outdent indent | \
+        "fullscreen undo redo | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough | alignleft aligncenter alignright alignjustify outdent indent | \
                 styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
-                table image media charmap hr pagebreak insertdatetime print preview | code selectall searchreplace visualblocks | indent2em lineheight formatpainter axupimgs",
+                table image charmap hr insertdatetime preview | selectall searchreplace visualblocks | indent2em lineheight formatpainter axupimgs",
     },
   },
   data() {
@@ -165,7 +171,7 @@ export default {
   },
   created() {},
   mounted() {
-    tinymce.init({});
+    tinymce.init({menubar: false,});
   },
   methods: {
     // 添加相关的事件，可用的事件参照文档=> https://github.com/tinymce/tinymce-vue => All available events
