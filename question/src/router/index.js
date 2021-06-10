@@ -120,7 +120,7 @@ let addRouter = [
     path: "/",
     iconCls: "fa fa-book", // 图标样式class
     name: routeName.question,
-    meta: { role: ["superAdmin", "admin"], isShowTabNav: true },
+    meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
     component: Layout,
     children: [
       {
@@ -129,7 +129,7 @@ let addRouter = [
         name: routeName.questionManage,
         component: questionManage,
         children: [],
-        meta: { role: ["superAdmin", "admin"], isShowTabNav: true }
+        meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true }
       },
       {
         path: "/nouploadExam",
@@ -145,7 +145,7 @@ let addRouter = [
     path: "/studentManage",
     iconCls: "fa fa-id-card-o", // 图标样式class
     name: routeName.studentManage,
-    meta: { role: ["superAdmin", "admin"], isShowTabNav: true },
+    meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
     component: Layout,
     alone: true,
     children: [
@@ -162,7 +162,7 @@ let addRouter = [
     path: "/classManage",
     iconCls: "fa fa-newspaper-o", // 图标样式class
     name: routeName.classManage,
-    meta: { role: ["superAdmin", "admin"], isShowTabNav: true },
+    meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
     component: Layout,
     alone: true,
     children: [

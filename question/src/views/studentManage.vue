@@ -1,6 +1,10 @@
 <template>
   <div>
-    <el-button class="addBtn" size="medium" @click="showDialog"
+    <el-button
+      class="addBtn"
+      size="medium"
+      @click="showDialog"
+      v-if="$store.getters.info.role !== 'ordinary'"
       >添加学生</el-button
     >
     <template>
@@ -37,7 +41,10 @@
         <el-table-column prop="level" label="年级"></el-table-column>
         <el-table-column prop="cno" label="班级"> </el-table-column>
         <el-table-column prop="headteacher" label="班主任"> </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column
+          label="操作"
+          v-if="$store.getters.info.role !== 'ordinary'"
+        >
           <template slot-scope="scope">
             <!-- <el-button size="mini" @click="handleEdit(scope.$index, scope.row)"
               >编辑</el-button
@@ -97,23 +104,23 @@ export default {
       dialogAddStu: false,
       formInline: {
         level: "",
-        cno: ""
+        cno: "",
       },
       stuForm: {
         sname: "",
         sno: "",
         sex: "男",
-        class: ""
+        class: "",
       },
       options: [],
-      tableData: []
+      tableData: [],
     };
   },
   mounted() {
     if (this.$route.query.level || this.$route.query.cno) {
       this.formInline = {
         level: this.$route.query.level,
-        cno: this.$route.query.cno
+        cno: this.$route.query.cno,
       };
     }
     this.getList();
@@ -125,15 +132,15 @@ export default {
       if (this.formInline.level || this.formInline.cno) {
         p = {
           level: this.formInline.level,
-          cno: this.formInline.cno
+          cno: this.formInline.cno,
         };
       }
       this.$request
         .fetchSearchStu(p)
-        .then(res => {
+        .then((res) => {
           this.tableData = res.data.result;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -141,55 +148,55 @@ export default {
       this.$request
         .fetchSearchClass({
           level: "",
-          headteacher: ""
+          headteacher: "",
         })
-        .then(res => {
+        .then((res) => {
           const result = res.data.result;
           let data = [];
           for (let i = 0; i < result.length; i++) {
             const curClass = result[i];
-            let curLevel = data.find(v => v.value === curClass.level);
+            let curLevel = data.find((v) => v.value === curClass.level);
             if (!curLevel) {
               curLevel = {
                 value: curClass.level,
                 label: curClass.level,
-                children: []
+                children: [],
               };
               data.push(curLevel);
             }
             curLevel.children.push({
               value: curClass.id,
-              label: curClass.cno
+              label: curClass.cno,
             });
           }
           this.options = data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "班级列表数据获取失败！",
-            type: "error"
+            type: "error",
           });
         });
     },
     delete(id) {
       this.$request
         .fetchDelStu({ id: id })
-        .then(res => {
+        .then((res) => {
           this.getList();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success"
+            type: "success",
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "删除失败！",
-            type: "error"
+            type: "error",
           });
         });
     },
@@ -217,16 +224,16 @@ export default {
           sname: this.stuForm.sname,
           sno: this.stuForm.sno,
           sex: this.stuForm.sex,
-          classid: this.stuForm.class
+          classid: this.stuForm.class,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.result) {
             this.dialogAddStu = false;
             this.getList();
             this.$message({
               showClose: true,
               message: "添加成功！",
-              type: "success"
+              type: "success",
             });
             return;
           }
@@ -234,24 +241,24 @@ export default {
             this.$message({
               showClose: true,
               message: res.data.desc,
-              type: "error"
+              type: "error",
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.$message({
             showClose: true,
             message: "添加失败！",
-            type: "error"
+            type: "error",
           });
         });
     },
     handleChange(value) {
       console.log(value);
       this.stuForm.class = value[1];
-    }
-  }
+    },
+  },
 };
 </script>
 

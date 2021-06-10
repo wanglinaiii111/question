@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-button size="medium" @click="back">返回上一级</el-button>
-    <el-button class="addBtn" size="medium" @click="clickUpload"
+    <el-button class="back" size="medium" @click="back">返回上一级</el-button>
+    <el-button class="addBtn" size="medium" @click="clickUpload" v-if="$store.getters.info.role !== 'ordinary'"
       >上传成绩单</el-button
     >
     <template>
@@ -19,7 +19,7 @@
           property="grade_file_path"
           label="成绩单"
         ></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" v-if="$store.getters.info.role !== 'ordinary'">
           <template slot-scope="scope">
             <el-popconfirm
               title="确定删除这个成绩单吗？"
@@ -243,6 +243,10 @@ export default {
   box-sizing: border-box;
   background-color: #ffffff;
   float: right;
+}
+
+.back{
+  margin-bottom: 20px;
 }
 
 h1 {

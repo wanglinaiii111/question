@@ -1,8 +1,12 @@
 <template>
   <div>
     <template>
-      <el-button size="medium" @click="back">返回上一级</el-button>
-      <el-button class="addBtn" size="medium" @click="createSubject"
+      <el-button class="back" size="medium" @click="back">返回上一级</el-button>
+      <el-button
+        class="addBtn"
+        size="medium"
+        @click="createSubject"
+        v-if="$store.getters.info.role !== 'ordinary'"
         >添加科目</el-button
       >
       <div class="card">
@@ -359,6 +363,10 @@ export default {
 .addBtn {
   float: right;
   margin-bottom: 20px;
+}
+
+.back{
+   margin-bottom: 20px;
 }
 
 .card {

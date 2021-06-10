@@ -1,7 +1,11 @@
 <template>
   <div>
     <template v-if="$store.getters.examLevel === 'exam'">
-      <el-button class="addBtn" size="medium" @click="dialogVisible = true"
+      <el-button
+        class="addBtn"
+        size="medium"
+        @click="dialogVisible = true"
+        v-if="$store.getters.info.role !== 'ordinary'"
         >创建考试</el-button
       >
       <el-table :data="tableData" style="width: 100%">
@@ -27,6 +31,7 @@
             <el-popconfirm
               title="确定删除这次考试吗？"
               @confirm="handleDelete(scope.row)"
+              v-if="$store.getters.info.role !== 'ordinary'"
             >
               <el-button slot="reference" size="mini" type="danger"
                 >删除</el-button
