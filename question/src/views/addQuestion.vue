@@ -338,7 +338,10 @@ export default {
     onSubmitUpdate() {
       //更新
       const len = this.form.points.length;
-      const len_id = this.form.exam_detail_id.length;
+      let id = this.form.exam_detail_id;
+      if (this.form.exam_detail_id && this.form.exam_detail_id.length > 0) {
+        id = this.form.exam_detail_id[this.form.exam_detail_id.length - 1];
+      }
       this.$request
         .fetchUpdateQuestion({
           libtype: this.form.libType,
@@ -350,8 +353,7 @@ export default {
           source: this.form.source,
           points: len > 1 ? this.form.points[len - 1] : this.form.points[0],
           answer: HtmlUtil.htmlEncodeByRegExp(this.form.answer),
-          exam_detail_id:
-            this.form.isExam === 1 ? this.form.exam_detail_id[len_id - 1] : "",
+          exam_detail_id: this.form.isExam === 1 ? id : "",
           id: this.form.id,
         })
         .then((res) => {
