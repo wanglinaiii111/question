@@ -41,7 +41,7 @@
             <el-form-item label="题库类型">
               <el-radio-group v-model="form.libType" @change="changeLibType">
                 <el-radio :label="1">公共题库</el-radio>
-                <el-radio :label="2">推荐题库</el-radio>
+                <el-radio :label="2" v-if="$store.getters.info.role !== 'ordinary'">推荐题库</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="试题文本">
