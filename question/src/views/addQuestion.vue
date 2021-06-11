@@ -13,15 +13,33 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="试题类型">
-          <el-input v-model="form.qtype" size="medium"></el-input>
+          <!-- <el-input v-model="form.qtype" size="medium"></el-input> -->
+          <el-select v-model="form.qtype" size="medium">
+            <el-option
+              v-for="item in qtypeOption"
+              :key="item"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="难度">
-          <el-input-number
+          <!-- <el-input-number
             v-model="form.difficulty"
             size="medium"
             :precision="2"
             :step="0.1"
-          ></el-input-number>
+          ></el-input-number> -->
+          <el-select v-model="form.difficulty" size="medium">
+            <el-option
+              v-for="item in diffOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="来源">
           <el-input v-model="form.source" size="medium"></el-input>
@@ -121,8 +139,8 @@ export default {
       time: new Date().getTime(),
       form: {
         libType: 1,
-        qtype: "",
-        difficulty: 0,
+        qtype: "选择题",
+        difficulty: 0.94,
         source: "",
         isExam: 0,
         points: "",
@@ -156,6 +174,29 @@ export default {
       //   },
       // },
       options: [],
+      diffOptions: [
+        {
+          value: 0.94,
+          label: "容易",
+        },
+        {
+          value: 0.85,
+          label: "较易",
+        },
+        {
+          value: 0.65,
+          label: "中等",
+        },
+        {
+          value: 0.4,
+          label: "较难",
+        },
+        {
+          value: 0,
+          label: "困难",
+        },
+      ],
+      qtypeOption: [],
     };
   },
   mounted() {
@@ -170,16 +211,33 @@ export default {
           ? `<img src=${
               url +
               "exam/download?filename=" +
-              this.updateData.qno.substring(3) +
+              this.getNo(this.updateData.weburl) +
               ".png&answerpic=1&stempic="
             } alt />`
           : HtmlUtil.htmlDecodeByRegExp(this.updateData.answer),
+        difficulty: this.getDiff(this.updateData.difficulty),
       };
     }
     this.getSubjectList();
     this.getExamList();
+    this.getQtype();
   },
   methods: {
+    getQtype() {
+      this.$request.fetchQtype({}).then((res) => {
+        if (res.data.desc) {
+          if (res.data.desc) {
+            this.$message({
+              showClose: true,
+              message: res.data.desc,
+              type: "error",
+            });
+          }
+          return;
+        }
+        this.qtypeOption = res.data.qtype_name_list;
+      });
+    },
     getKnowledgeNode(id) {
       this.$request
         .fetchKnowledgeNode({
@@ -384,6 +442,14 @@ export default {
     isImage(str) {
       if (!str) return;
       return str.indexOf("http") == 0 ? true : false;
+    },
+    getDiff(val) {
+      if (+val === 0.64) return 0.65;
+      if (+val === 0.15) return 0;
+      return +val;
+    },
+    getNo(url) {
+      return url ? url.split("13q")[1].split(".html")[0] : "";
     },
   },
 };

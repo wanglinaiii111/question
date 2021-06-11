@@ -40,4 +40,10 @@ router.post('/matching', async function (req, res, next) {
   res.send(result);
 });
 
+router.get('/qtype', async function (req, res, next) {
+  let p = req.query;
+  let result = await questionDao.qtype(p);
+  res.send(result);
+});
+
 module.exports = router;

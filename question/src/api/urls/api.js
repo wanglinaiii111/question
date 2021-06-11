@@ -55,7 +55,8 @@ let api = {
   addQuestion: "question/add",
   delQuestion: "question/del",
   updateQuestion: "question/update",
-  matchingQuestion: "question/matching"
+  matchingQuestion: "question/matching",
+  qtype: "question/qtype"
 };
 for (const key in api) {
   api[key] = url + api[key];

@@ -154,7 +154,7 @@ export default {
   //.试题删除  GET
   fetchDelQuestion(data) {
     return axios.get(apiUrls.delQuestion, {
-      params: data,
+      params: data
     });
   },
   //试题匹配
@@ -164,5 +164,11 @@ export default {
   //试题修改更新  POST JSON
   fetchUpdateQuestion(data) {
     return axios.post(apiUrls.updateQuestion, data);
+  },
+  //试题修改更新  POST JSON
+  fetchQtype(data) {
+    return axios.get(apiUrls.qtype, {
+      params: data
+    });
   }
 };

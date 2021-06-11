@@ -49,11 +49,20 @@ async function matching(param) {
   });
 }
 
+async function qtype(param) {
+  return await common.service({
+    url: config.api_url + '/question/qtype/',
+    method: 'get',
+    params: param,
+  });
+}
+
 module.exports = {
   getKnowledge,
   select,
   add,
   update,
   del,
-  matching
+  matching,
+  qtype
 };

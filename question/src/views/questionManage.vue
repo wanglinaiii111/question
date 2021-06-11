@@ -41,7 +41,11 @@
             <el-form-item label="题库类型">
               <el-radio-group v-model="form.libType" @change="changeLibType">
                 <el-radio :label="1">公共题库</el-radio>
-                <el-radio :label="2" v-if="$store.getters.info.role !== 'ordinary'">推荐题库</el-radio>
+                <el-radio
+                  :label="2"
+                  v-if="$store.getters.info.role !== 'ordinary'"
+                  >推荐题库</el-radio
+                >
               </el-radio-group>
             </el-form-item>
             <el-form-item label="试题文本">
@@ -65,6 +69,8 @@
         <el-card class="box-card" v-for="item in questionList" :key="item.id">
           <div slot="header" class="clearfix">
             <div>
+              <span>题号：{{ item.qno }}</span>
+              <el-divider direction="vertical"></el-divider>
               <span>{{
                 item.qtype.indexOf("题型") !== -1
                   ? item.qtype
@@ -76,24 +82,8 @@
               <span>
                 {{
                   item.difficulty.indexOf("难度") !== -1
-                    ? item.difficulty
-                    : "难度：" + item.difficulty
-                }}
-              </span>
-              <el-divider direction="vertical"></el-divider>
-              <span>
-                {{
-                  item.nums.indexOf("引用次数") !== -1
-                    ? item.nums
-                    : "引用次数：" + item.nums
-                }}
-              </span>
-              <el-divider direction="vertical"></el-divider>
-              <span>
-                {{
-                  item.update_time.indexOf("更新时间") !== -1
-                    ? item.update_time
-                    : "更新时间：" + item.update_time
+                    ? diffMap[item.difficulty]
+                    : "难度：" + diffMap[item.difficulty]
                 }}
               </span>
             </div>
@@ -119,13 +109,6 @@
           </div>
           <div>
             <div class="title">
-              {{ item.qno }}
-              <!-- <div class="toolBtn">
-                <el-button class="addBtn" size="mini" @click="this.curQues = item">更新</el-button>
-                <el-popconfirm title="确定删除这道题吗？" @confirm="deleteQues(item.id)">
-                  <el-button slot="reference" size="mini" type="danger">删除</el-button>
-                </el-popconfirm>
-              </div>-->
               <span v-html="HtmlUtil.htmlDecodeByRegExp(item.stem)"></span>
             </div>
             <img
@@ -133,7 +116,7 @@
               :src="
                 url +
                 'exam/download?filename=' +
-                item.qno.substring(3) +
+                getNo(item.weburl) +
                 '.png' +
                 '&answerpic=1&stempic='
               "
@@ -188,6 +171,15 @@ export default {
       },
       curQues: null,
       parentNodes: [],
+      diffMap: {
+        0.94: "容易",
+        0.85: "较易",
+        0.65: "中等",
+        0.64: "中等",
+        0.4: "较难",
+        0.15: "困难",
+        0: "困难",
+      },
     };
   },
   computed: {
@@ -347,6 +339,9 @@ export default {
           this.questionList = res.data;
           this.fullscreenLoading = false;
         });
+    },
+    getNo(url) {
+      return url ? url.split("13q")[1].split(".html")[0] : "";
     },
   },
 };
