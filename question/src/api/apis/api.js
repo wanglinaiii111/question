@@ -170,5 +170,43 @@ export default {
     return axios.get(apiUrls.qtype, {
       params: data
     });
+  },
+  //推送成绩单(年组成绩单)到获取班级分组接口前先检测成绩单上传情况
+  fetchCheckreport(data) {
+    return axios.post(apiUrls.checkreport, data);
+  },
+  //合并班级成绩单
+  fetchClevelreport(data) {
+    return axios.post(apiUrls.clevelreport, data);
+  },
+  //添加分组数据POST JSON
+  fetchAddgroup(data) {
+    return axios.post(apiUrls.addgroup, data);
+  },
+  //查询分组 GET（复合条件查询）
+  fetchSearchgroup(data) {
+    return axios.get(apiUrls.searchgroup, {
+      params: data
+    });
+  },
+  //删除某次考试下的所有分组。GET
+  fetchDelgroup(data) {
+    return axios.get(apiUrls.delgroup, {
+      params: data
+    });
+  },
+  //分组修改: POST JSON
+  fetchUpdategroup(data) {
+    return axios.post(apiUrls.updategroup, data);
+  },
+  //添加小组试题。POST JSON
+  fetchAddquestion(data) {
+    return axios.post(apiUrls.addquestion, data);
+  },
+  //删除小组推荐试题中的某个试题
+  fetchDelquestion(data) {
+    return axios.get(apiUrls.delquestion, {
+      params: data
+    });
   }
 };

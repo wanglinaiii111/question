@@ -18,7 +18,8 @@ export default {
       }
     ],
     examLevel: "exam",
-    questionLevel: "list"
+    questionLevel: "list",
+    groupLevel: "group"
   },
   mutations: {
     addTab(state, arg) {
@@ -92,6 +93,9 @@ export default {
     },
     setQuestionLevel(state, type) {
       state.questionLevel = type;
+    },
+    setGroupLevel(state, type) {
+      state.groupLevel = type;
     }
   },
   actions: {
@@ -115,6 +119,9 @@ export default {
     },
     setQuestionLevel({ commit }, type) {
       commit("setQuestionLevel", type);
+    },
+    setGroupLevel({ commit }, type) {
+      commit("setGroupLevel", type);
     }
   }
 };

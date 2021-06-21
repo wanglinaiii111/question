@@ -17,7 +17,11 @@ const en = {
     download: "download",
     question: "question",
     questionManage: "questionManage",
-    nouploadExam:'nouploadExam',
+    nouploadExam: "nouploadExam",
+    group: "group",
+    addGroup: "addGroup",
+    searchGroup: "searchGroup",
+    recommendQues: "recommendQues",
 
     home: "home",
     article: "article",

@@ -37,6 +37,9 @@ const classReport = () => import("@/views/classReport");
 const download = () => import("@/views/download");
 const questionManage = () => import("@/views/questionManage");
 const nouploadExam = () => import("@/views/nouploadExam");
+const addGroup = () => import("@/views/addGroup");
+const searchGroup = () => import("@/views/searchGroup");
+const recommendQues = () => import("@/views/recommendQues");
 
 /**
  * 重写路由的push方法
@@ -82,40 +85,6 @@ let defaultRouter = [
 ];
 
 let addRouter = [
-  // {
-  //   path: "/questionManage",
-  //   iconCls: "fa fa-book", // 图标样式class
-  //   name: routeName.questionManage,
-  //   meta: { role: ["superAdmin", "admin"], isShowTabNav: true },
-  //   component: Layout,
-  //   alone: true,
-  //   children: [
-  //     {
-  //       path: "/questionManage",
-  //       iconCls: "fa fa-book", // 图标样式class
-  //       name: "questionManage",
-  //       component: questionManage,
-  //       children: []
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: "/nouploadExam",
-  //   iconCls: "fa fa-list-ul", // 图标样式class
-  //   name: routeName.nouploadExam,
-  //   meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
-  //   component: Layout,
-  //   alone: true,
-  //   children: [
-  //     {
-  //       path: "/nouploadExam",
-  //       iconCls: "fa fa-list-ul", // 图标样式class
-  //       name: "nouploadExam",
-  //       component: nouploadExam,
-  //       children: []
-  //     }
-  //   ]
-  // },
   {
     path: "/",
     iconCls: "fa fa-book", // 图标样式class
@@ -138,6 +107,45 @@ let addRouter = [
         component: nouploadExam,
         children: [],
         meta: { role: ["superAdmin", "admin"], isShowTabNav: true }
+      }
+    ]
+  },
+  {
+    path: "/",
+    iconCls: "fa fa-group", // 图标样式class
+    name: routeName.group,
+    meta: { role: ["superAdmin"], isShowTabNav: true },
+    component: Layout,
+    children: [
+      {
+        path: "/addGroup",
+        iconCls: "fa fa-object-group", // 图标样式class
+        name: routeName.addGroup,
+        component: addGroup,
+        children: [],
+        meta: { role: ["superAdmin"], isShowTabNav: true }
+      },
+      {
+        path: "/searchGroup",
+        iconCls: "fa fa-search", // 图标样式class
+        name: routeName.searchGroup,
+        component: searchGroup,
+        children: [],
+        meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true }
+      }
+    ]
+  },
+  {
+    path: "/recommendQues",
+    name: "recommendQues",
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: "/recommendQues",
+        name: "recommendQues",
+        component: recommendQues,
+        children: []
       }
     ]
   },

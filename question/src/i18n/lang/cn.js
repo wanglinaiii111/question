@@ -16,7 +16,11 @@ const cn = {
     download: "文件下载",
     question: "题库管理",
     questionManage: "试题列表",
-    nouploadExam: "未上传记录"
+    nouploadExam: "未上传记录",
+    group: "分组管理",
+    addGroup: "创建分组",
+    searchGroup: "查询分组",
+    recommendQues: "推荐试题"
   },
   rightMenu: {
     close: "关闭",
