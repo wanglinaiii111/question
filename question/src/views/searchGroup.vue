@@ -55,6 +55,7 @@
           <el-popconfirm
             title="确定删除当前考试下的所有分组吗？"
             @confirm="delGroup"
+            v-if="$store.getters.info.role === 'superAdmin'"
           >
             <el-button slot="reference" type="danger">删除分组</el-button>
           </el-popconfirm>
@@ -94,13 +95,11 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column
-          label="操作"
-          v-if="$store.getters.info.role == 'superAdmin'"
-        >
+        <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
               v-if="
+                $store.getters.info.role === 'superAdmin' &&
                 !(
                   +scope.row.is_sure_student === 1 &&
                   +scope.row.is_sure_question === 1
@@ -144,7 +143,7 @@
         </div>
       </el-dialog>
     </div>
-    <RecommendQues v-else :curGroupData='curGroupData'></RecommendQues>
+    <RecommendQues v-else :curGroupData="curGroupData"></RecommendQues>
   </div>
 </template>
 

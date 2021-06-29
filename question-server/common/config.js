@@ -7,6 +7,7 @@ const Config = {
     DB_PW: "adminPass",
     errLog: "../app.err",
     api_url: "http://8.140.105.168:5002",
+    api_url2: "http://101.34.63.122:80",
     // api_url: "http://127.0.0.1:8001",
 };
 

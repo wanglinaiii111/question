@@ -138,6 +138,7 @@ export default {
             return;
           }
           this.clevelreport();
+          this.getGroup()
         });
     },
     clevelreport() {
@@ -155,6 +156,15 @@ export default {
             this.$message.error(res.data.desc);
           }
           this.isGetGroup = true;
+        });
+    },
+    getGroup() {
+      this.$request
+        .fetchGetgroup({
+          examName: '期末考试'
+        })
+        .then((res) => {
+          
         });
     },
     getGrade() {

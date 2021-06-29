@@ -128,17 +128,24 @@
       :param="gradeParam"
       @func="getGradeMsg"
     ></ClassReport>
+    <ExamQuesList
+      v-else-if="$store.getters.examLevel === 'quesList'"
+      :param="gradeParam"
+      @func="getGradeMsg"
+    ></ExamQuesList>
   </div>
 </template>
 
 <script>
 import SubjectList from "./subjectList";
 import ClassReport from "./classReport";
+import ExamQuesList from "./examQuesList";
 export default {
   name: "student",
   components: {
     SubjectList: SubjectList,
     ClassReport: ClassReport,
+    ExamQuesList: ExamQuesList,
   },
   data() {
     return {

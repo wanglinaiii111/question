@@ -179,6 +179,10 @@ export default {
   fetchClevelreport(data) {
     return axios.post(apiUrls.clevelreport, data);
   },
+  //获取分组
+  fetchGetgroup(data) {
+    return axios.post(apiUrls.getgroup, data);
+  },
   //添加分组数据POST JSON
   fetchAddgroup(data) {
     return axios.post(apiUrls.addgroup, data);
@@ -206,6 +210,28 @@ export default {
   //删除小组推荐试题中的某个试题
   fetchDelquestion(data) {
     return axios.get(apiUrls.delquestion, {
+      params: data
+    });
+  },
+  //录入试卷试题
+  fetchExamQuesInsert(data) {
+    return axios.post(apiUrls.examQuesInsert, data);
+  },
+  //获取考试试题列表 GET
+  fetchExamQuesSelect(data) {
+    return axios.get(apiUrls.examQuesSelect, {
+      params: data
+    });
+  },
+  //删除考试试题
+  fetchExamQuesDelete(data) {
+    return axios.get(apiUrls.examQuesDelete, {
+      params: data
+    });
+  },
+  //将考试试题生成到excel    GET
+  fetchExamQuesToExcel(data) {
+    return axios.get(apiUrls.examQuesToExcel, {
       params: data
     });
   }

@@ -81,6 +81,38 @@ async function notUploadExam(param) {
   });
 }
 
+async function examInsert(param) {
+  return await common.service({
+    url: config.api_url + '/exam/exampoints/insert',
+    method: 'post',
+    data: param,
+  });
+}
+
+async function examQuesSelect(param) {
+  return await common.service({
+    url: config.api_url + '/exam/exampoints/select',
+    method: 'get',
+    params: param,
+  });
+}
+
+async function examQuesDelete(param) {
+  return await common.service({
+    url: config.api_url + '/exam/exampoints/delete',
+    method: 'get',
+    params: param,
+  });
+}
+
+async function examQuesToExcel(param) {
+  return await common.service({
+    url: config.api_url + '/exam/exampoints/cfile',
+    method: 'get',
+    params: param,
+  });
+}
+
 module.exports = {
   create,
   select,
@@ -92,4 +124,8 @@ module.exports = {
   selectGradeReport,
   examUpload,
   notUploadExam,
+  examInsert,
+  examQuesSelect,
+  examQuesDelete,
+  examQuesToExcel,
 };

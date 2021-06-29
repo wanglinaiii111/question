@@ -16,6 +16,14 @@ router.post('/clevelreport', async function (req, res, next) {
   res.send(result);
 });
 
+router.post('/getgroup', async function (req, res, next) {
+  let p = req.body;
+  console.log('result');
+  let result = await intelligenceDao.getgroup(p);
+  console.log(result);
+  res.send(result);
+});
+
 router.post('/addgroup', async function (req, res, next) {
   let p = req.body;
   let result = await intelligenceDao.addgroup(p);

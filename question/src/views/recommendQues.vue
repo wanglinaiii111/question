@@ -22,7 +22,7 @@
             }}
           </span>
         </div>
-        <div class="toolBtn">
+        <div class="toolBtn" v-if="$store.getters.info.role === 'superAdmin'">
           <el-popconfirm
             title="确定删除这道题吗？"
             @confirm="deleteQues(item.id)"

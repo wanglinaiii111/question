@@ -161,4 +161,28 @@ router.get('/download', async function (req, res, next) {
     //     .finally(() => {});
 });
 
+router.post('/exampoints/insert', async function (req, res, next) {
+    let p = req.body;
+    let result = await examDao.examInsert(p);
+    res.send(result);
+});
+
+router.get('/exampoints/select', async function (req, res, next) {
+    let p = req.query;
+    let result = await examDao.examQuesSelect(p);
+    res.send(result);
+});
+
+router.get('/exampoints/delete', async function (req, res, next) {
+    let p = req.query;
+    let result = await examDao.examQuesDelete(p);
+    res.send(result);
+});
+
+router.get('/exampoints/toExcel', async function (req, res, next) {
+    let p = req.query;
+    let result = await examDao.examQuesToExcel(p);
+    res.send(result);
+});
+
 module.exports = router;

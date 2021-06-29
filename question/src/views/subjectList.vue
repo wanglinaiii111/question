@@ -27,11 +27,11 @@
         ></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <!-- <el-button size="mini" @click="clickUpload(scope.row)"
-              >上传成绩单</el-button
-            > -->
             <el-button size="mini" @click="showReport(scope.row)"
               >查看各班级成绩单</el-button
+            >
+            <el-button size="mini" @click="showQues(scope.row)"
+              >查看试题</el-button
             >
           </template>
         </el-table-column>
@@ -65,9 +65,6 @@
             :on-exceed="() => handleExceed('试卷')"
           >
             <el-button size="small" type="primary">点击上传</el-button>
-            <!-- <div slot="tip" class="el-upload__tip">
-              只能上传jpg/png文件，且不超过500kb
-            </div> -->
           </el-upload>
         </el-form-item>
         <el-form-item label="上传答案">
@@ -80,9 +77,6 @@
             :on-exceed="() => handleExceed('答案')"
           >
             <el-button size="small" type="primary">点击上传</el-button>
-            <!-- <div slot="tip" class="el-upload__tip">
-              只能上传jpg/png文件，且不超过500kb
-            </div> -->
           </el-upload>
         </el-form-item>
       </el-form>
@@ -91,33 +85,6 @@
         <el-button type="primary" @click="submitAddSubject">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- <el-dialog title="上传成绩单" :visible.sync="dialogGrade" width="347px">
-      <el-form :model="gradeForm" label-width="90px">
-        <el-form-item label="班级">
-          <el-cascader
-            v-model="gradeForm.class"
-            :options="options"
-            @change="handleChange"
-          ></el-cascader>
-        </el-form-item>
-        <el-form-item label="上传成绩单">
-          <el-upload
-            action=""
-            :with-credentials="true"
-            :limit="1"
-            :file-list="gradeFileList"
-            :http-request="param => upload(param, 'grade')"
-            :on-exceed="() => handleExceed('成绩单')"
-          >
-            <el-button size="small" type="primary">上传成绩单</el-button>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogAddStu = false">取 消</el-button>
-        <el-button type="primary" @click="submitGradeForm()">确 定</el-button>
-      </span>
-    </el-dialog> -->
   </div>
 </template>
 
@@ -128,7 +95,6 @@ export default {
   data() {
     return {
       dialogSubVisible: false,
-      // dialogGrade: false,
       formAddSub: {
         subject_id: "1",
         question_file_path: "",
@@ -140,14 +106,8 @@ export default {
       exam_name: "",
       fileList: [],
       answersFileList: [],
-      // gradeFileList: [],
       fileName: "",
       answersFileName: "",
-      // gradeFileName: "",
-      // gradeForm: {
-      //   class: ""
-      // },
-      // options: []
     };
   },
   mounted() {
@@ -155,7 +115,6 @@ export default {
     this.exam_name = this.param.exam_name || "";
     this.getList();
     this.getSubjectList();
-    // this.getClassList();
   },
   methods: {
     upload(param, type) {
@@ -173,7 +132,6 @@ export default {
       formData.append("filename", filename);
       console.log(formData);
       this.$request.fetchExamUpload(formData).then((res) => {
-        // console.log(res);
         if (res.IsSuccess) {
           this.imgList.push(res.Data.Data);
         }
@@ -189,42 +147,6 @@ export default {
           console.log(error);
         });
     },
-    // getClassList() {
-    //   this.$request
-    //     .fetchSearchClass({
-    //       level: "",
-    //       headteacher: ""
-    //     })
-    //     .then(res => {
-    //       const result = res.data.result;
-    //       let data = [];
-    //       for (let i = 0; i < result.length; i++) {
-    //         const curClass = result[i];
-    //         let curLevel = data.find(v => v.value === curClass.level);
-    //         if (!curLevel) {
-    //           curLevel = {
-    //             value: curClass.level,
-    //             label: curClass.level,
-    //             children: []
-    //           };
-    //           data.push(curLevel);
-    //         }
-    //         curLevel.children.push({
-    //           value: curClass.id,
-    //           label: curClass.cno
-    //         });
-    //       }
-    //       this.options = data;
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //       this.$message({
-    //         showClose: true,
-    //         message: "班级列表数据获取失败！",
-    //         type: "error"
-    //       });
-    //     });
-    // },
     getSubjectList() {
       this.$request
         .fetchSelectSubject({})
@@ -279,60 +201,7 @@ export default {
           console.log(error);
         });
     },
-    // clickUpload(row) {
-    //   this.dialogGrade = true;
-    //   this.formAddSub = {
-    //     ...this.formAddSub,
-    //     exam_id: this.exam_id,
-    //     subject_id: row.subject_id,
-    //     exam_detail_id: row.exam_detail_id
-    //   };
-    // },
-    // submitGradeForm() {
-    //   if (!this.gradeFileName) {
-    //     this.$message.error(`成绩单未上传，请上传成绩单`);
-    //     return;
-    //   }
-    //   this.$request
-    //     .fetchCreateGradereport({
-    //       exam_id: this.formAddSub.exam_id,
-    //       exam_detail_id: this.formAddSub.exam_detail_id,
-    //       class_id: this.gradeForm.class,
-    //       grade_file_path: this.gradeFileName
-    //     })
-    //     .then(res => {
-    //       if (res.data.result) {
-    //         this.dialogGrade = false;
-    //         this.$message({
-    //           showClose: true,
-    //           message: "上传成功！",
-    //           type: "success"
-    //         });
-    //         return;
-    //       }
-    //       if (res.data.desc) {
-    //         this.$message({
-    //           showClose: true,
-    //           message: res.data.desc,
-    //           type: "error"
-    //         });
-    //       }
-    //     })
-    //     .catch(error => {
-    //       console.log(error);
-    //     });
-    // },
     showReport(row) {
-      // this.$router.push({
-      //   path: "/classReport",
-      //   query: {
-      //     exam_detail_id: row.exam_detail_id,
-      //     subject_name: row.subject_name,
-      //     exam_name: this.exam_name,
-      //     exam_id: row.exam_id,
-      //     subject_id: row.subject_id,
-      //   },
-      // });
       this.$emit("func", {
         exam_detail_id: row.exam_detail_id,
         subject_name: row.subject_name,
@@ -349,11 +218,18 @@ export default {
       this.fileList = [];
       this.answersFileList = [];
     },
-    // handleChange(value) {
-    //   this.gradeForm.class = value[1];
-    // }
     back() {
       this.$store.dispatch("setExamLevel", "exam");
+    },
+    showQues(row) {
+      this.$emit("func", {
+        exam_detail_id: row.exam_detail_id,
+        subject_name: row.subject_name,
+        exam_name: this.exam_name,
+        exam_id: row.exam_id,
+        subject_id: row.subject_id,
+      });
+      this.$store.dispatch("setExamLevel", "quesList");
     },
   },
 };
@@ -365,8 +241,8 @@ export default {
   margin-bottom: 20px;
 }
 
-.back{
-   margin-bottom: 20px;
+.back {
+  margin-bottom: 20px;
 }
 
 .card {
