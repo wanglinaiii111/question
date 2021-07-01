@@ -9,9 +9,9 @@ async function checkreport(param) {
   });
 }
 
-async function clevelreport(param) {
+async function pushReport(param) {
   return await common.service({
-    url: config.api_url + '/intelligence/clevelreport/',
+    url: config.api_url + '/intelligence/push/',
     method: 'post',
     data: param,
   });
@@ -57,6 +57,14 @@ async function updategroup(param) {
   });
 }
 
+async function getProblem(param) {
+  return await common.service({
+    url: config.api_url2 + '/getProblem',
+    method: 'post',
+    data: param,
+  });
+}
+
 async function addquestion(param) {
   return await common.service({
     url: config.api_url + '/intelligence/addquestion/',
@@ -73,14 +81,24 @@ async function delquestion(param) {
   });
 }
 
+async function selectquestion(param) {
+  return await common.service({
+    url: config.api_url + '/intelligence/selectquestion/',
+    method: 'get',
+    params: param,
+  });
+}
+
 module.exports = {
   checkreport,
-  clevelreport,
+  pushReport,
   getgroup,
   addgroup,
   searchgroup,
   updategroup,
   delgroup,
+  getProblem,
   addquestion,
   delquestion,
+  selectquestion,
 };

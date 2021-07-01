@@ -37,9 +37,13 @@
         <el-button type="primary" @click="checkGrade">获取分组</el-button>
       </el-form-item>
     </el-form>
-    <GroupTable v-if="isGetGroup" :studentMap="studentMap"></GroupTable>
+    <GroupTable
+      v-if="isGetGroup"
+      :studentMap="studentMap"
+      :tableData="tableData"
+    ></GroupTable>
     <el-dialog
-      title="以下班级没有上传成绩单，是否确认创建分组？"
+      title="以下班级没有上传成绩单，是否确认获取分组？"
       :visible.sync="dialogTableVisible"
     >
       <el-table :data="no_upload_grade_cno">
@@ -74,7 +78,9 @@ export default {
       classList: [],
       no_upload_grade_cno: [],
       studentMap: {},
+      tableData: [],
       isGetGroup: false,
+      examDetailIdMap: {},
     };
   },
   mounted() {
@@ -102,6 +108,11 @@ export default {
         .fetchSelectExamsubject({ exam_id: id })
         .then((res) => {
           this.examsubjectList = res.data;
+          for (let i = 0; i < res.data.length; i++) {
+            this.examDetailIdMap[
+              `${res.data[i]["exam_id"]}-${res.data[i]["subject_id"]}`
+            ] = res.data[i]["exam_detail_id"];
+          }
           if (res.data.length > 0) {
             const id = res.data[0].subject_id;
             this.form.examSub = id;
@@ -122,55 +133,85 @@ export default {
         });
     },
     checkGrade() {
+      const examDetailId =
+        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
       this.getStudentList();
       this.$request
         .fetchCheckreport({
-          grade_file_name_list: this.getGrade(),
+          exam_detail_id: examDetailId,
         })
         .then((res) => {
-          // const cnos = ["1", "2"];
-          const cnos = res.data.no_upload_grade_cno;
-          if (cnos.length > 0) {
-            this.dialogTableVisible = true;
-            this.no_upload_grade_cno = cnos.map((item) => {
-              return { cno: item, level: res.data.level };
-            });
-            return;
+          if (res.data.examid === "" || res.data.examid === null) {
+            return this.$message.error("当前年级没有班级上传成绩单");
           }
-          this.clevelreport();
-          this.getGroup()
+          const cnos = res.data.no_upload_grade_cno;
+          this.dialogTableVisible = true;
+          this.no_upload_grade_cno = cnos.map((item) => {
+            return { cno: item, level: res.data.level };
+          });
+          console.log(this.no_upload_grade_cno);
         });
     },
-    clevelreport() {
-      if (this.getGrade().length === 0) {
-        return this.$message.error("当前年级下面没有班级");
-      }
+    pushreport() {
+      const examDetailId =
+        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
       this.$request
-        .fetchClevelreport({
+        .fetchPushreport({
           grade_file_name_list: this.getGrade(),
-          examid: this.form.exam,
-          subjectid: this.form.examSub,
+          exam_detail_id: examDetailId,
+          subject_id: this.form.examSub,
+          level: this.form.level,
         })
         .then((res) => {
-          if (res.data.desc === "合并失败!") {
+          if (res.data.desc !== "推送成功!") {
             this.$message.error(res.data.desc);
+            return;
           }
-          this.isGetGroup = true;
         });
     },
     getGroup() {
+      const examDetailId =
+        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
       this.$request
         .fetchGetgroup({
-          examName: '期末考试'
+          examName: examDetailId + "",
         })
         .then((res) => {
-          
+          this.isGetGroup = true;
+          this.tableData = res.data.data;
+          this.saveGroup(res.data.data);
+        });
+    },
+    saveGroup(data) {
+      const examDetailId =
+        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
+      this.$request
+        .fetchAddgroup({
+          exam_detail_id: examDetailId,
+          glist: data,
+        })
+        .then((res) => {
+          if (res.data.desc) {
+            this.$message.error(res.data.desc);
+            return;
+          }
+          this.$message.success("获取成功");
         });
     },
     getGrade() {
-      return this.classList.map((item) => {
-        return `${this.form.exam}_${this.form.examSub}_${this.form.level}_${item.cno}_grade.xlsx`;
+      const obj = {};
+      this.no_upload_grade_cno.map((item) => {
+        obj[item.cno] = item;
+        return item;
       });
+      const arr = [];
+      for (let i = 0; i < this.classList.length; i++) {
+        if (!obj[this.classList[i].cno]) {
+          const xlsx = `${this.form.exam}_${this.form.examSub}_${this.form.level}_${this.classList[i].cno}_grade.xlsx`;
+          arr.push(xlsx);
+        }
+      }
+      return arr;
     },
     getStudentList() {
       // 查询某一个年级的所有学生
@@ -187,7 +228,6 @@ export default {
             obj[result[i].sno] = result[i];
           }
           this.studentMap = obj;
-          console.log(obj);
         })
         .catch((error) => {
           console.log(error);
@@ -195,7 +235,8 @@ export default {
     },
     confirm() {
       this.dialogTableVisible = false;
-      this.clevelreport();
+      this.pushreport();
+      this.getGroup();
     },
     changeLevel(val) {
       this.form.level = val;

@@ -1,5 +1,5 @@
 let url = "http://localhost:8002/";
-url = "./"; // 打包时配置
+// url = "./"; // 打包时配置
 
 let api = {
   // 登录post
@@ -58,14 +58,16 @@ let api = {
   matchingQuestion: "question/matching",
   qtype: "question/qtype",
   checkreport: "intelligence/checkreport",
-  clevelreport: "intelligence/clevelreport",
+  pushreport: "intelligence/pushreport",
   getgroup: "intelligence/getgroup",
   addgroup: "intelligence/addgroup",
   searchgroup: "intelligence/searchgroup",
   delgroup: "intelligence/delgroup",
   updategroup: "intelligence/updategroup",
+  getProblem: "intelligence/getProblem",
   addquestion: "intelligence/addquestion",
   delquestion: "intelligence/delquestion",
+  selectquestion: "intelligence/selectquestion",
   examQuesInsert: "exam/exampoints/insert",
   examQuesSelect: "exam/exampoints/select",
   examQuesDelete: "exam/exampoints/delete",

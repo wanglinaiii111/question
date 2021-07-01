@@ -176,8 +176,8 @@ export default {
     return axios.post(apiUrls.checkreport, data);
   },
   //合并班级成绩单
-  fetchClevelreport(data) {
-    return axios.post(apiUrls.clevelreport, data);
+  fetchPushreport(data) {
+    return axios.post(apiUrls.pushreport, data);
   },
   //获取分组
   fetchGetgroup(data) {
@@ -203,6 +203,10 @@ export default {
   fetchUpdategroup(data) {
     return axios.post(apiUrls.updategroup, data);
   },
+  //获取推荐试题
+  fetchGetProblem(data) {
+    return axios.post(apiUrls.getProblem, data);
+  },
   //添加小组试题。POST JSON
   fetchAddquestion(data) {
     return axios.post(apiUrls.addquestion, data);
@@ -210,6 +214,12 @@ export default {
   //删除小组推荐试题中的某个试题
   fetchDelquestion(data) {
     return axios.get(apiUrls.delquestion, {
+      params: data
+    });
+  },
+  //查询小组试题 GET
+  fetchSelectquestion(data) {
+    return axios.get(apiUrls.selectquestion, {
       params: data
     });
   },

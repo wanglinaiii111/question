@@ -59,6 +59,9 @@
           >
             <el-button slot="reference" type="danger">删除分组</el-button>
           </el-popconfirm>
+          <el-button type="primary" size="medium" @click="confirmCurGroup"
+            >确认分组</el-button
+          >
         </el-form-item>
       </el-form>
       <el-table :data="tableData">
@@ -97,7 +100,7 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button
+            <!-- <el-button
               v-if="
                 $store.getters.info.role === 'superAdmin' &&
                 !(
@@ -108,39 +111,26 @@
               size="mini"
               @click="handleEdit(scope.row)"
               >更新</el-button
-            >
+            > -->
             <el-button size="mini" @click="handleShowQues(scope.row)"
               >查看推荐试题</el-button
             >
           </template>
         </el-table-column>
       </el-table>
-      <el-dialog title="更新分组" :visible.sync="dialogFormVisible">
-        <el-form :model="formDialog" label-width="100px">
-          <el-form-item label="组号"> {{ formDialog.groupid }} </el-form-item>
-          <el-form-item label="是否确认学生">
-            <el-radio-group
-              v-model="formDialog.is_sure_student"
-              :disabled="+updateDate.is_sure_student === 1"
-            >
-              <el-radio label="0">未确认</el-radio>
-              <el-radio label="1">已确认</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="是否确认题目">
-            <el-radio-group
-              v-model="formDialog.is_sure_question"
-              :disabled="+updateDate.is_sure_question === 1"
-            >
-              <el-radio label="0">未确认</el-radio>
-              <el-radio label="1">已确认</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
+      <el-dialog
+        title="确认分组"
+        :visible.sync="dialogFormVisible"
+        width="650px"
+      >
+        <ConfirmGroup
+          :studentMap="studentMap"
+          :groupData="tableData"
+        ></ConfirmGroup>
+        <!-- <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="confirmUpdate">确 定</el-button>
-        </div>
+        </div> -->
       </el-dialog>
     </div>
     <RecommendQues v-else :curGroupData="curGroupData"></RecommendQues>
@@ -149,10 +139,12 @@
 
 <script>
 import RecommendQues from "./recommendQues.vue";
+import ConfirmGroup from "./confirmGroup.vue";
 export default {
   name: "group-table",
   components: {
     RecommendQues: RecommendQues,
+    ConfirmGroup: ConfirmGroup,
   },
   data() {
     return {
@@ -289,11 +281,11 @@ export default {
         };
       });
     },
-    handleEdit(row) {
-      this.dialogFormVisible = true;
-      this.updateDate = { ...row };
-      this.formDialog = { ...row };
-    },
+    // handleEdit(row) {
+    //   this.dialogFormVisible = true;
+    //   this.updateDate = { ...row };
+    //   this.formDialog = { ...row };
+    // },
     confirmUpdate() {
       this.$request
         .fetchUpdategroup({
@@ -314,6 +306,12 @@ export default {
           console.log(error);
         });
     },
+    confirmCurGroup() {
+      if (this.tableData.length === 0) {
+        return this.$message.error("请先查询要确认的分组");
+      }
+      this.dialogFormVisible = true;
+    },
     delGroup() {
       if (this.examSub.length === 0) {
         return this.$message.error("请选择要删除分组的考试科目");
@@ -330,7 +328,7 @@ export default {
         });
     },
     handleShowQues(row) {
-      this.curGroupData = row;
+      this.curGroupData = { ...row, subjectId: this.examSub };
       this.$store.dispatch("setGroupLevel", "ques");
     },
   },

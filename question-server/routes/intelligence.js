@@ -10,17 +10,15 @@ router.post('/checkreport', async function (req, res, next) {
   res.send(result);
 });
 
-router.post('/clevelreport', async function (req, res, next) {
+router.post('/pushreport', async function (req, res, next) {
   let p = req.body;
-  let result = await intelligenceDao.clevelreport(p);
+  let result = await intelligenceDao.pushReport(p);
   res.send(result);
 });
 
 router.post('/getgroup', async function (req, res, next) {
   let p = req.body;
-  console.log('result');
   let result = await intelligenceDao.getgroup(p);
-  console.log(result);
   res.send(result);
 });
 
@@ -48,6 +46,12 @@ router.post('/updategroup', async function (req, res, next) {
   res.send(result);
 });
 
+router.post('/getProblem', async function (req, res, next) {
+  let p = req.body;
+  let result = await intelligenceDao.getProblem(p);
+  res.send(result);
+});
+
 router.post('/addquestion', async function (req, res, next) {
   let p = req.body;
   let result = await intelligenceDao.addquestion(p);
@@ -58,6 +62,12 @@ router.get('/delquestion', async function (req, res, next) {
   let p = req.query;
   let result = await intelligenceDao.delquestion(p);
   res.send({ result });
+});
+
+router.get('/selectquestion', async function (req, res, next) {
+  let p = req.query;
+  let result = await intelligenceDao.selectquestion(p);
+  res.send(result);
 });
 
 module.exports = router;
