@@ -59,7 +59,11 @@
           >
             <el-button slot="reference" type="danger">删除分组</el-button>
           </el-popconfirm>
-          <el-button type="primary" size="medium" @click="confirmCurGroup"
+          <el-button
+            type="primary"
+            size="medium"
+            @click="confirmCurGroup"
+            v-if="!isConfirmGroup"
             >确认分组</el-button
           >
         </el-form-item>
@@ -124,13 +128,10 @@
         width="650px"
       >
         <ConfirmGroup
-          :studentMap="studentMap"
+          :form="form"
           :groupData="tableData"
+          @getConfirmStatus="getConfirmStatus"
         ></ConfirmGroup>
-        <!-- <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmUpdate">确 定</el-button>
-        </div> -->
       </el-dialog>
     </div>
     <RecommendQues v-else :curGroupData="curGroupData"></RecommendQues>
@@ -164,6 +165,7 @@ export default {
       classList: [],
       studentMap: {},
       curGroupData: null,
+      isConfirmGroup: true,
     };
   },
   beforeRouteLeave(to, from, next) {
@@ -179,6 +181,7 @@ export default {
       if (this.examSub.length === 0) {
         return this.$message.error("请选择考试科目");
       }
+      this.isConfirmGroup = true;
       this.$request
         .fetchSearchgroup({
           ...this.form,
@@ -186,6 +189,12 @@ export default {
         })
         .then((res) => {
           this.tableData = res.data.result;
+          for (let i = 0; i < this.tableData.length; i++) {
+            console.log(this.tableData[i]["is_sure_student"]);
+            if (+this.tableData[i]["is_sure_student"] === 0) {
+              this.isConfirmGroup = false;
+            }
+          }
         });
     },
     getClassList() {
@@ -281,11 +290,6 @@ export default {
         };
       });
     },
-    // handleEdit(row) {
-    //   this.dialogFormVisible = true;
-    //   this.updateDate = { ...row };
-    //   this.formDialog = { ...row };
-    // },
     confirmUpdate() {
       this.$request
         .fetchUpdategroup({
@@ -330,6 +334,10 @@ export default {
     handleShowQues(row) {
       this.curGroupData = { ...row, subjectId: this.examSub };
       this.$store.dispatch("setGroupLevel", "ques");
+    },
+    getConfirmStatus(status) {
+      this.getList();
+      this.dialogFormVisible = false;
     },
   },
 };

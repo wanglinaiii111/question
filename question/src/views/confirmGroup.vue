@@ -1,13 +1,12 @@
 <template>
   <div>
-    <h3>学生列表</h3>
+    <h3>未分组学生列表</h3>
     <el-checkbox-group v-model="checkList">
-      <el-checkbox
-        v-for="item in Object.values(studentMap)"
-        :key="item.id"
-        :label="item.sno"
-        >{{ item.sname }}</el-checkbox
-      >
+      <template v-for="item in Object.values(studentList)">
+        <el-checkbox :key="item.id" :label="item.sno" v-if="!item.isGroup">{{
+          item.sname
+        }}</el-checkbox>
+      </template>
     </el-checkbox-group>
     <div v-for="item in groupData" :key="item.id" class="list">
       <h3>{{ item.level }}-{{ item.cno }}-{{ item.groupid }}组</h3>
@@ -26,13 +25,21 @@
         >
       </el-checkbox-group>
     </div>
+    <el-popconfirm
+      title="确定确认分组吗？确认后将不再可修改！"
+      @confirm="confirmBtn()"
+    >
+      <el-button type="primary" size="medium" slot="reference"
+        >确认分组</el-button
+      >
+    </el-popconfirm>
   </div>
 </template>
 
 <script>
 export default {
   name: "confirm-group",
-  props: ["studentMap", "groupData"],
+  props: ["groupData", "form"],
   data() {
     const getGroupMap = () => {
       const obj = {};
@@ -44,47 +51,78 @@ export default {
     return {
       checkList: [],
       group: getGroupMap(),
+      studentList: {},
     };
   },
   mounted() {
-    // console.log(this.studentMap);
-    // console.log(this.groupData);
-    // console.log(this.group);
+    this.getStudentList();
   },
   methods: {
+    getStudentList() {
+      // 查询某一个年级的所有学生
+      this.$request
+        .fetchSearchStu({
+          level: this.form.level,
+          cno: this.form.cno,
+        })
+        .then((res) => {
+          const result = res.data.result;
+          const obj = {};
+          for (let i = 0; i < result.length; i++) {
+            obj[result[i].sno] = result[i];
+          }
+          this.studentList = obj;
+          const arr = [];
+          for (let i = 0; i < this.groupData.length; i++) {
+            const stuList = this.getStuList(this.groupData[i]["snos"]);
+            arr.push(...stuList);
+          }
+          for (let j = 0; j < arr.length; j++) {
+            if (this.studentList[arr[j]["sno"]]) {
+              this.studentList[arr[j]["sno"]] = {
+                ...this.studentList[arr[j]["sno"]],
+                isGroup: true,
+              };
+            }
+          }
+        });
+    },
     add(id) {
-      console.log(this.checkList);
-      console.log(this.group["group" + id]);
+      const check = this.group["group" + id];
+      for (let i = 0; i < check.length; i++) {
+        this.studentList[check[i]] = {
+          ...this.studentList[check[i]],
+          isGroup: true,
+        };
+      }
       for (let i = 0; i < this.groupData.length; i++) {
-        if (this.groupData[i]["id"] === id) {
-          this.groupData[i]["snos"] = this.checkList.join(",");
+        if (this.groupData[i]["id"] === id && this.checkList.length > 0) {
+          this.groupData[i]["snos"] += `${
+            this.groupData[i]["snos"] ? "," : ""
+          }${this.checkList.join(",")}`;
         }
       }
-      console.log(this.groupData);
+      this.checkList = [];
     },
     del(id) {
+      const check = this.group["group" + id];
+      for (let i = 0; i < check.length; i++) {
+        this.studentList[check[i]] = {
+          ...this.studentList[check[i]],
+          isGroup: false,
+        };
+      }
       for (let i = 0; i < this.groupData.length; i++) {
         if (this.groupData[i]["id"] === id) {
           const arr = this.getStuList(this.groupData[i]["snos"]);
-          const newArr = arr.filter((item) => {
-            for (let k = 0; k < this.group["group" + id].length; k++) {
-              if (item["sno"] === this.group["group" + id][k]) {
-                return false;
-              }
-              return true;
-            }
+          const filterArr = arr.filter((item) => !check.includes(item["sno"]));
+          const newArr = filterArr.map((item) => {
+            return item["sno"];
           });
-          console.log(newArr);
-          // for(let j =0;j<arr.length;j++){
-          //     for(let k=0;k<this.group["group" + id].length;k++){
-          //         if(arr[j]['sno'] === this.group["group" + id][k]){
-
-          //         }
-          //     }
-          // }
-        //   this.groupData[i]["snos"] = this.checkList.join(",");
+          this.groupData[i]["snos"] = newArr.join(",");
         }
       }
+      this.group["group" + id] = [];
     },
     getStuList(snos) {
       if (!snos) {
@@ -94,11 +132,46 @@ export default {
       return data.map((item) => {
         return {
           sno: item,
-          sname: this.studentMap[item]
-            ? this.studentMap[item]["sname"]
+          sname: this.studentList[item]
+            ? this.studentList[item]["sname"]
             : "未知",
         };
       });
+    },
+    confirmBtn() {
+      const arr = [];
+      for (let i = 0; i < this.groupData.length; i++) {
+        arr.push(
+          this.confirmUpdate(
+            this.groupData[i]["id"],
+            this.groupData[i]["is_sure_question"],
+            this.groupData[i]["groupid"],
+            this.groupData[i]["snos"]
+          )
+        );
+      }
+      Promise.all(arr)
+        .then(() => {
+          this.$emit("getConfirmStatus", true);
+        })
+        .catch(() => {
+          this.$message.error("确认失败");
+        });
+    },
+    confirmUpdate(id, is_sure_question, groupid, snos) {
+      this.$request
+        .fetchUpdategroup({
+          id: id,
+          is_sure_student: 1,
+          is_sure_question: is_sure_question,
+          groupid: groupid,
+          snos: snos,
+        })
+        .then((res) => {
+          if (res.data.desc) {
+            this.$message.error(res.data.desc);
+          }
+        });
     },
   },
 };
