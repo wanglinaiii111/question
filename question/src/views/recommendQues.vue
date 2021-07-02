@@ -13,66 +13,73 @@
         >确认试题</el-button
       >
     </el-popconfirm>
-    <el-card class="box-card" v-for="item in questionList" :key="item.id">
-      <div slot="header" class="clearfix">
-        <div>
-          <span>题号：{{ item.qno }}</span>
-          <el-divider direction="vertical"></el-divider>
-          <span>{{
-            item.qtype.indexOf("题型") !== -1
-              ? item.qtype
-              : "题型：" + item.qtype
-          }}</span>
-          <el-divider direction="vertical"></el-divider>
-          <span>{{ item.source }}</span>
-          <el-divider direction="vertical"></el-divider>
-          <span>
-            {{
-              item.difficulty.indexOf("难度") !== -1
-                ? diffMap[item.difficulty]
-                : "难度：" + diffMap[item.difficulty]
-            }}
-          </span>
-        </div>
-        <div
-          class="toolBtn"
-          v-if="
-            $store.getters.info.role === 'superAdmin' &&
-            +curGroupData.is_sure_question === 0
-          "
-        >
-          <el-popconfirm
-            title="确定删除这道题吗？"
-            @confirm="deleteQues(item.id)"
+    <el-button class="addBtn" size="medium" @click="download"
+      >导出word</el-button
+    >
+    <div id="myHtml">
+      <el-card class="box-card" v-for="item in questionList" :key="item.id">
+        <div slot="header" class="clearfix">
+          <div>
+            <span>题号：{{ item.qno }}</span>
+            <el-divider direction="vertical"></el-divider>
+            <span>{{
+              item.qtype.indexOf("题型") !== -1
+                ? item.qtype
+                : "题型：" + item.qtype
+            }}</span>
+            <el-divider direction="vertical"></el-divider>
+            <span>{{ item.source }}</span>
+            <el-divider direction="vertical"></el-divider>
+            <span>
+              {{
+                item.difficulty.indexOf("难度") !== -1
+                  ? diffMap[item.difficulty]
+                  : "难度：" + diffMap[item.difficulty]
+              }}
+            </span>
+          </div>
+          <div
+            class="toolBtn"
+            v-if="
+              $store.getters.info.role === 'superAdmin' &&
+              +curGroupData.is_sure_question === 0
+            "
           >
-            <el-button slot="reference" size="mini" type="danger"
-              >删除</el-button
+            <el-popconfirm
+              title="确定删除这道题吗？"
+              @confirm="deleteQues(item.id)"
             >
-          </el-popconfirm>
+              <el-button slot="reference" size="mini" type="danger"
+                >删除</el-button
+              >
+            </el-popconfirm>
+          </div>
         </div>
-      </div>
-      <div>
-        <div class="title">
-          <span v-html="HtmlUtil.htmlDecodeByRegExp(item.stem)"></span>
+        <div>
+          <div class="title">
+            <span v-html="HtmlUtil.htmlDecodeByRegExp(item.stem)"></span>
+          </div>
+          <img
+            v-if="isImage(item.answer)"
+            :src="
+              url +
+              'exam/download?filename=' +
+              getNo(item.weburl) +
+              '.png' +
+              '&answerpic=1&stempic='
+            "
+            alt
+          />
+          <span v-else v-html="HtmlUtil.htmlDecodeByRegExp(item.answer)"></span>
         </div>
-        <img
-          v-if="isImage(item.answer)"
-          :src="
-            url +
-            'exam/download?filename=' +
-            getNo(item.weburl) +
-            '.png' +
-            '&answerpic=1&stempic='
-          "
-          alt
-        />
-        <span v-else v-html="HtmlUtil.htmlDecodeByRegExp(item.answer)"></span>
-      </div>
-    </el-card>
+      </el-card>
+    </div>
   </div>
 </template>
 
 <script>
+import saveAs from "file-saver";
+import '../jquery.wordexport.js'
 import { HtmlUtil } from "../utils/htmlEncode";
 import { url } from "../api/urls/api";
 export default {
@@ -175,6 +182,7 @@ export default {
             return this.$message.error(res.data.desc);
           }
           this.$message.success("确定成功");
+          this.back();
         })
         .catch((error) => {
           console.log(error);
@@ -190,6 +198,9 @@ export default {
     back() {
       this.$store.dispatch("setGroupLevel", "group");
     },
+    download() {
+      $("#myHtml").wordExport(`${this.curGroupData.level}届-${this.curGroupData.cno}班-${this.curGroupData.groupid}组推荐试题`);
+    },
   },
 };
 </script>
@@ -198,6 +209,7 @@ export default {
 .addBtn {
   float: right;
   margin-bottom: 20px;
+  margin-left: 10px;
 }
 
 .box-card {

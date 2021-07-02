@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="$store.getters.groupLevel === 'group'">
+    <div v-if="groupLevel === 'group'">
       <el-form
         ref="form"
         :model="form"
@@ -175,6 +175,18 @@ export default {
   mounted() {
     this.getClassList();
     this.getExamList();
+  },
+  computed: {
+    groupLevel() {
+      return this.$store.getters.groupLevel;
+    },
+  },
+  watch: {
+    groupLevel(n, m) {
+      if (n === "group") {
+        this.search();
+      }
+    },
   },
   methods: {
     getList() {
