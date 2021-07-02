@@ -1,6 +1,16 @@
 <template>
   <div class="card">
     <el-form ref="form" :model="form" label-width="80px" class="myForm">
+      <el-form-item label="年级">
+        <el-date-picker
+          v-model="form.level"
+          type="year"
+          value-format="yyyy"
+          placeholder="选择年级"
+          size="medium"
+          @change="changeLevel"
+        ></el-date-picker>
+      </el-form-item>
       <el-form-item label="考试名称" size="medium">
         <el-select v-model="form.exam">
           <el-option
@@ -22,30 +32,12 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="年级">
-        <el-date-picker
-          v-model="form.level"
-          type="year"
-          value-format="yyyy"
-          placeholder="选择年级"
-          size="medium"
-          @change="changeLevel"
-        >
-        </el-date-picker>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="checkGrade">获取分组</el-button>
       </el-form-item>
     </el-form>
-    <GroupTable
-      v-if="isGetGroup"
-      :studentMap="studentMap"
-      :tableData="tableData"
-    ></GroupTable>
-    <el-dialog
-      title="以下班级没有上传成绩单，是否确认获取分组？"
-      :visible.sync="dialogTableVisible"
-    >
+    <GroupTable v-if="isGetGroup" :studentMap="studentMap" :tableData="tableData"></GroupTable>
+    <el-dialog title="以下班级没有上传成绩单，是否确认获取分组？" :visible.sync="dialogTableVisible">
       <el-table :data="no_upload_grade_cno">
         <el-table-column property="level" label="年级"></el-table-column>
         <el-table-column property="cno" label="班号"></el-table-column>
@@ -63,14 +55,14 @@ import GroupTable from "./groupTable.vue";
 export default {
   name: "addgroup",
   components: {
-    GroupTable: GroupTable,
+    GroupTable: GroupTable
   },
   data() {
     return {
       form: {
         exam: "",
         examSub: "",
-        level: new Date().getFullYear() + "",
+        level: new Date().getFullYear() + ""
       },
       dialogTableVisible: false,
       examList: [],
@@ -80,7 +72,7 @@ export default {
       studentMap: {},
       tableData: [],
       isGetGroup: false,
-      examDetailIdMap: {},
+      examDetailIdMap: {}
     };
   },
   mounted() {
@@ -91,7 +83,7 @@ export default {
     getExamList() {
       this.$request
         .fetchSelectExam({})
-        .then((res) => {
+        .then(res => {
           this.examList = res.data.result;
           if (res.data.result.length > 0) {
             const id = res.data.result[0].exam_id;
@@ -99,14 +91,14 @@ export default {
             this.form.exam = id;
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
     getExamSubList(id) {
       this.$request
         .fetchSelectExamsubject({ exam_id: id })
-        .then((res) => {
+        .then(res => {
           this.examsubjectList = res.data;
           for (let i = 0; i < res.data.length; i++) {
             this.examDetailIdMap[
@@ -118,7 +110,7 @@ export default {
             this.form.examSub = id;
           }
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -126,43 +118,45 @@ export default {
       this.$request
         .fetchSearchClass({
           level: this.form.level,
-          headteacher: "",
+          headteacher: ""
         })
-        .then((res) => {
+        .then(res => {
           this.classList = res.data.result;
         });
     },
     checkGrade() {
-      const examDetailId =
-        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
+      const examDetailId = this.examDetailIdMap[
+        `${this.form.exam}-${this.form.examSub}`
+      ];
       this.getStudentList();
       this.$request
         .fetchCheckreport({
-          exam_detail_id: examDetailId,
+          exam_detail_id: examDetailId
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.examid === "" || res.data.examid === null) {
             return this.$message.error("当前年级没有班级上传成绩单");
           }
           const cnos = res.data.no_upload_grade_cno;
           this.dialogTableVisible = true;
-          this.no_upload_grade_cno = cnos.map((item) => {
+          this.no_upload_grade_cno = cnos.map(item => {
             return { cno: item, level: res.data.level };
           });
           console.log(this.no_upload_grade_cno);
         });
     },
     pushreport() {
-      const examDetailId =
-        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
+      const examDetailId = this.examDetailIdMap[
+        `${this.form.exam}-${this.form.examSub}`
+      ];
       this.$request
         .fetchPushreport({
           grade_file_name_list: this.getGrade(),
           exam_detail_id: examDetailId,
           subject_id: this.form.examSub,
-          level: this.form.level,
+          level: this.form.level
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.desc !== "推送成功!") {
             this.$message.error(res.data.desc);
             return;
@@ -170,27 +164,29 @@ export default {
         });
     },
     getGroup() {
-      const examDetailId =
-        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
+      const examDetailId = this.examDetailIdMap[
+        `${this.form.exam}-${this.form.examSub}`
+      ];
       this.$request
         .fetchGetgroup({
-          examName: examDetailId + "",
+          examName: examDetailId + ""
         })
-        .then((res) => {
+        .then(res => {
           this.isGetGroup = true;
           this.tableData = res.data.data;
           this.saveGroup(res.data.data);
         });
     },
     saveGroup(data) {
-      const examDetailId =
-        this.examDetailIdMap[`${this.form.exam}-${this.form.examSub}`];
+      const examDetailId = this.examDetailIdMap[
+        `${this.form.exam}-${this.form.examSub}`
+      ];
       this.$request
         .fetchAddgroup({
           exam_detail_id: examDetailId,
-          glist: data,
+          glist: data
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.desc) {
             this.$message.error(res.data.desc);
             return;
@@ -200,7 +196,7 @@ export default {
     },
     getGrade() {
       const obj = {};
-      this.no_upload_grade_cno.map((item) => {
+      this.no_upload_grade_cno.map(item => {
         obj[item.cno] = item;
         return item;
       });
@@ -219,9 +215,9 @@ export default {
         .fetchSearchStu({
           level: this.form.level,
           // cno: this.form.cno,
-          cno: "",
+          cno: ""
         })
-        .then((res) => {
+        .then(res => {
           const result = res.data.result;
           const obj = {};
           for (let i = 0; i < result.length; i++) {
@@ -229,7 +225,7 @@ export default {
           }
           this.studentMap = obj;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -245,8 +241,8 @@ export default {
     changeExam(val) {
       this.form.exam = val;
       this.getExamSubList(val);
-    },
-  },
+    }
+  }
 };
 </script>
 

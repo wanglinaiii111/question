@@ -16,17 +16,11 @@
             value-format="yyyy"
             placeholder="选择年级"
             @change="changeLevel"
-          >
-          </el-date-picker>
+          ></el-date-picker>
         </el-form-item>
         <el-form-item label="班号">
           <el-select v-model="form.cno">
-            <el-option
-              v-for="item in classList"
-              :key="item.id"
-              :label="item.cno"
-              :value="item.cno"
-            ></el-option>
+            <el-option v-for="item in classList" :key="item.id" :label="item.cno" :value="item.cno"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考试科目">
@@ -64,74 +58,49 @@
             size="medium"
             @click="confirmCurGroup"
             v-if="!isConfirmGroup"
-            >确认分组</el-button
-          >
+          >确认分组</el-button>
         </el-form-item>
       </el-form>
       <el-table :data="tableData">
         <el-table-column type="expand">
           <template slot-scope="props">
-            <el-table
-              :data="getTableData(props.row.snos)"
-              style="width: 100%"
-              border
-            >
+            <el-table :data="getTableData(props.row.snos)" style="width: 100%" border>
               <el-table-column prop="sname" label="学生姓名"></el-table-column>
               <el-table-column prop="sno" label="学号"></el-table-column>
             </el-table>
           </template>
         </el-table-column>
-        <el-table-column prop="level" label="年级"></el-table-column>
-        <el-table-column prop="cno" label="班号"></el-table-column>
-        <el-table-column prop="groupid" label="组号"> </el-table-column>
-        <el-table-column prop="rank" label="所属分级"> </el-table-column>
-        <el-table-column prop="weakpoints_and_rate" label="薄弱知识点信息">
-        </el-table-column>
+        <el-table-column prop="groupid" label="组号"></el-table-column>
+        <el-table-column prop="rank" label="所属分级"></el-table-column>
+        <el-table-column prop="weakpoints_and_rate" label="薄弱知识点信息"></el-table-column>
         <!-- <el-table-column prop="snos" label="学生学号"> </el-table-column> -->
         <el-table-column label="是否确认学生">
           <template slot-scope="scope">
-            <div>
-              {{ +scope.row.is_sure_student === 0 ? "未确认" : "已确认" }}
-            </div>
+            <div>{{ +scope.row.is_sure_student === 0 ? "未确认" : "已确认" }}</div>
           </template>
         </el-table-column>
         <el-table-column label="是否确认题目">
           <template slot-scope="scope">
             <div>
-              {{ +scope.row.is_sure_question === 0 ? "未确认" : "已确认" }}
+              <el-button
+                v-if="+scope.row.is_sure_question === 0"
+                size="mini"
+                @click="handleShowQues(scope.row)"
+              >确认试题</el-button>
+              <el-button v-else size="mini" @click="handleShowQues(scope.row)">查看推荐试题</el-button>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <!-- <el-table-column label="操作">
           <template slot-scope="scope">
-            <!-- <el-button
-              v-if="
-                $store.getters.info.role === 'superAdmin' &&
-                !(
-                  +scope.row.is_sure_student === 1 &&
-                  +scope.row.is_sure_question === 1
-                )
-              "
-              size="mini"
-              @click="handleEdit(scope.row)"
-              >更新</el-button
-            > -->
             <el-button size="mini" @click="handleShowQues(scope.row)"
               >查看推荐试题</el-button
             >
           </template>
-        </el-table-column>
+        </el-table-column>-->
       </el-table>
-      <el-dialog
-        title="确认分组"
-        :visible.sync="dialogFormVisible"
-        width="650px"
-      >
-        <ConfirmGroup
-          :form="form"
-          :groupData="tableData"
-          @getConfirmStatus="getConfirmStatus"
-        ></ConfirmGroup>
+      <el-dialog title="确认分组" :visible.sync="dialogFormVisible" width="650px">
+        <ConfirmGroup :form="form" :groupData="tableData" @getConfirmStatus="getConfirmStatus"></ConfirmGroup>
       </el-dialog>
     </div>
     <RecommendQues v-else :curGroupData="curGroupData"></RecommendQues>
@@ -145,7 +114,7 @@ export default {
   name: "group-table",
   components: {
     RecommendQues: RecommendQues,
-    ConfirmGroup: ConfirmGroup,
+    ConfirmGroup: ConfirmGroup
   },
   data() {
     return {
@@ -155,7 +124,7 @@ export default {
         cno: "",
         exam_detail_id: "",
         is_sure_student: "0",
-        is_sure_question: "0",
+        is_sure_question: "0"
       },
       formDialog: {},
       updateDate: {},
@@ -165,7 +134,7 @@ export default {
       classList: [],
       studentMap: {},
       curGroupData: null,
-      isConfirmGroup: true,
+      isConfirmGroup: true
     };
   },
   beforeRouteLeave(to, from, next) {
@@ -179,14 +148,14 @@ export default {
   computed: {
     groupLevel() {
       return this.$store.getters.groupLevel;
-    },
+    }
   },
   watch: {
     groupLevel(n, m) {
       if (n === "group") {
         this.search();
       }
-    },
+    }
   },
   methods: {
     getList() {
@@ -197,9 +166,9 @@ export default {
       this.$request
         .fetchSearchgroup({
           ...this.form,
-          exam_detail_id: this.examSub[1],
+          exam_detail_id: this.examSub[1]
         })
-        .then((res) => {
+        .then(res => {
           this.tableData = res.data.result;
           for (let i = 0; i < this.tableData.length; i++) {
             console.log(this.tableData[i]["is_sure_student"]);
@@ -213,9 +182,9 @@ export default {
       this.$request
         .fetchSearchClass({
           level: this.form.level,
-          headteacher: "",
+          headteacher: ""
         })
-        .then((res) => {
+        .then(res => {
           const result = res.data.result;
           this.classList = result;
           if (result.length > 0) {
@@ -226,7 +195,7 @@ export default {
     getExamList() {
       this.$request
         .fetchSelectExam({})
-        .then((res) => {
+        .then(res => {
           this.options = [];
           const result = res.data.result;
           result.map(async (item, index) => {
@@ -234,28 +203,28 @@ export default {
             this.options.push({
               value: item.exam_id,
               label: item.name,
-              children: [],
+              children: []
             });
-            sub.map((subItem) => {
+            sub.map(subItem => {
               this.options[index].children.push({
                 value: subItem.exam_detail_id,
-                label: subItem.subject_name,
+                label: subItem.subject_name
               });
             });
             return item;
           });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
     getExam_subjectList(id) {
       return this.$request
         .fetchSelectExamsubject({ exam_id: id })
-        .then((res) => {
+        .then(res => {
           return res.data;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -265,9 +234,9 @@ export default {
         .fetchSearchStu({
           level: this.form.level,
           // cno: this.form.cno,
-          cno: "",
+          cno: ""
         })
-        .then((res) => {
+        .then(res => {
           const result = res.data.result;
           const obj = {};
           for (let i = 0; i < result.length; i++) {
@@ -275,7 +244,7 @@ export default {
           }
           this.studentMap = obj;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -295,10 +264,10 @@ export default {
         return [];
       }
       const data = snos.split(",");
-      return data.map((item) => {
+      return data.map(item => {
         return {
           sno: item,
-          sname: this.studentMap[item] ? this.studentMap[item]["sname"] : "",
+          sname: this.studentMap[item] ? this.studentMap[item]["sname"] : ""
         };
       });
     },
@@ -309,16 +278,16 @@ export default {
           is_sure_student: this.formDialog.is_sure_student,
           is_sure_question: this.formDialog.is_sure_question,
           groupid: this.formDialog.groupid,
-          snos: this.formDialog.snos,
+          snos: this.formDialog.snos
         })
-        .then((res) => {
+        .then(res => {
           this.dialogFormVisible = false;
           if (res.data.desc) {
             this.$message.error(res.data.desc);
           }
           this.search();
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
@@ -334,12 +303,12 @@ export default {
       }
       this.$request
         .fetchDelgroup({ exam_detail_id: this.examSub[1] })
-        .then((res) => {
+        .then(res => {
           this.search();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success",
+            type: "success"
           });
         });
     },
@@ -350,8 +319,8 @@ export default {
     getConfirmStatus(status) {
       this.getList();
       this.dialogFormVisible = false;
-    },
-  },
+    }
+  }
 };
 </script>
 

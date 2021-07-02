@@ -1,3 +1,14 @@
+
+=TEXT(E14,"YYYY")
+=IF(E14,(YEAR(TODAY())-VALUE(TEXT(E14,"YYYY")))+((MONTH(TODAY())-VALUE(TEXT(E14,"MM")))/12)+((DAY(TODAY())-VALUE(TEXT(E14,"DD")))/365),)
+=IF(E14,(YEAR(TODAY())-YEAR(E14))+((MONTH(TODAY())-MONTH(E14))/12)+((DAY(TODAY())-DAY(E14))/365),)
+
+
+=YEAR(TODAY())-VALUE(TEXT(E14,"YYYY"))
+=(MONTH(TODAY())-VALUE(TEXT(E14,"MM"))/12
+=((DAY(TODAY())-VALUE(TEXT(E14,"DD")))/365)
+
+
 1、user/update  修改账号的时候必须得修改账号名 否则就提示修改失败
 2、登录接口没有验证
 3、http://localhost:8081/api/class/select?level=2021&headteacher=%E6%95%99%E5%B8%881 
