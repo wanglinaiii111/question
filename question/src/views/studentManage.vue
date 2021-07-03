@@ -17,6 +17,7 @@
               value-format="yyyy"
               placeholder="选择年级"
               size="medium"
+              format='yyyy届'
             >
             </el-date-picker>
           </el-form-item>

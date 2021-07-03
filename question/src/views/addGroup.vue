@@ -9,6 +9,7 @@
           placeholder="选择年级"
           size="medium"
           @change="changeLevel"
+          format='yyyy届'
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="班号">
@@ -160,7 +161,7 @@ export default {
         });
     },
     getGroupBtn() {
-      if (this.examSub.length === 0) {
+      if (this.form.examSub.length === 0) {
         return this.$message.error("请选择考试科目");
       }
       this.getGroupList();
@@ -175,8 +176,14 @@ export default {
         })
         .then((res) => {
           if (res.data.result.length > 0) {
-            return this.$message.error(
-              "当前考试已获取过分组，请去分组查询页面查看！"
+            return this.$confirm(
+              "当前考试已获取过分组，请去分组查询页面查看！",
+              "提示",
+              {
+                confirmButtonText: "确定",
+                type: "success",
+                showCancelButton: false,
+              }
             );
           }
           this.checkGrade();
@@ -242,7 +249,11 @@ export default {
             this.$message.error(res.data.desc);
             return;
           }
-          this.$message.error("分组获取成功，请去分组查询页面查看！");
+          return this.$confirm("分组获取成功，请去分组查询页面查看！", "提示", {
+            confirmButtonText: "确定",
+            type: "success",
+            showCancelButton: false,
+          });
         });
     },
     getGrade() {

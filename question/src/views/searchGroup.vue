@@ -16,6 +16,7 @@
             value-format="yyyy"
             placeholder="选择年级"
             @change="changeLevel"
+            format='yyyy届'
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="班号">
