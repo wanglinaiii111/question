@@ -13,7 +13,11 @@
         >确认试题</el-button
       >
     </el-popconfirm>
-    <el-button class="addBtn" size="medium" @click="download"
+    <el-button
+      class="addBtn"
+      size="medium"
+      @click="download"
+      v-if="+curGroupData.is_sure_question === 1"
       >导出word</el-button
     >
     <div id="myHtml">
