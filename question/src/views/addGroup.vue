@@ -267,7 +267,9 @@ export default {
       const arr = [];
       for (let i = 0; i < this.classList.length; i++) {
         if (!obj[this.classList[i].cno]) {
-          const xlsx = `${this.form.exam}_${this.form.examSub}_${this.form.level}_${this.classList[i].cno}_grade.xlsx`;
+          const xlsx = `${this.form.examSub[0]}_${
+            this.examSubMap[this.form.examSub[1]]
+          }_${this.form.level}_${this.classList[i].cno}_grade.xlsx`;
           arr.push(xlsx);
         }
       }
