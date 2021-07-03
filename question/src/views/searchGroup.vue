@@ -16,7 +16,7 @@
             value-format="yyyy"
             placeholder="选择年级"
             @change="changeLevel"
-            format='yyyy届'
+            format="yyyy届"
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="班号">
@@ -109,6 +109,7 @@
         width="650px"
       >
         <ConfirmGroup
+          v-if="dialogFormVisible"
           :form="form"
           :groupData="tableData"
           @getConfirmStatus="getConfirmStatus"
@@ -121,7 +122,10 @@
         width="650px"
       >
         <el-table :data="gridData">
-          <el-table-column property="weakpoint" label="薄弱知识点"></el-table-column>
+          <el-table-column
+            property="weakpoint"
+            label="薄弱知识点"
+          ></el-table-column>
           <el-table-column property="rate" label="正确率"></el-table-column>
         </el-table>
       </el-dialog>

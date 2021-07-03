@@ -9,7 +9,7 @@
           placeholder="选择年级"
           size="medium"
           @change="changeLevel"
-          format='yyyy届'
+          format="yyyy届"
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="班号">
@@ -235,7 +235,9 @@ export default {
           examName: this.form.examSub[1] + "",
         })
         .then((res) => {
-          this.saveGroup(res.data.data);
+          const result = res.data.data;
+          const newArr = result.filter((item) => item.class === this.form.cno);
+          this.saveGroup(newArr);
         });
     },
     saveGroup(data) {
