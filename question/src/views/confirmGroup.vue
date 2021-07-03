@@ -80,7 +80,6 @@ export default {
     };
   },
   mounted() {
-    console.log(this.curGroupData, this.form);
     this.getStudentList();
   },
   methods: {
@@ -114,32 +113,41 @@ export default {
         });
     },
     add(id) {
-      const check = this.checkList;
+      let check = this.checkList;
       for (let i = 0; i < check.length; i++) {
         this.studentList[check[i]] = {
           ...this.studentList[check[i]],
           isGroup: true,
         };
       }
+      const cl = [];
+      for (var key in this.group) {
+        cl.push(...this.group[key]);
+        if (this.group[key].length > 0) {
+          const id = key.split("group")[1];
+          this.del(id, "delOther");
+        }
+      }
+      check = [...check, ...cl];
       for (let i = 0; i < this.groupData.length; i++) {
-        if (this.groupData[i]["id"] === id && this.checkList.length > 0) {
+        if (this.groupData[i]["id"] === id && check.length > 0) {
           this.groupData[i]["snos"] += `${
             this.groupData[i]["snos"] ? "," : ""
-          }${this.checkList.join(",")}`;
+          }${check.join(",")}`;
         }
       }
       this.checkList = [];
     },
-    del(id) {
+    del(id, type) {
       const check = this.group["group" + id];
       for (let i = 0; i < check.length; i++) {
         this.studentList[check[i]] = {
           ...this.studentList[check[i]],
-          isGroup: false,
+          isGroup: type === "delOther" ? true : false,
         };
       }
       for (let i = 0; i < this.groupData.length; i++) {
-        if (this.groupData[i]["id"] === id) {
+        if (+this.groupData[i]["id"] === +id) {
           const arr = this.getStuList(this.groupData[i]["snos"]);
           const filterArr = arr.filter((item) => !check.includes(item["sno"]));
           const newArr = filterArr.map((item) => {
