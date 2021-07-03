@@ -20,7 +20,12 @@
         </el-form-item>
         <el-form-item label="班号">
           <el-select v-model="form.cno">
-            <el-option v-for="item in classList" :key="item.id" :label="item.cno" :value="item.cno"></el-option>
+            <el-option
+              v-for="item in classList"
+              :key="item.id"
+              :label="item.cno"
+              :value="item.cno"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考试科目">
@@ -32,39 +37,24 @@
             size="medium"
           ></el-cascader>
         </el-form-item>
-        <el-form-item label="是否确认学生">
-          <el-radio-group v-model="form.is_sure_student">
-            <el-radio label="0">未确认</el-radio>
-            <el-radio label="1">已确认</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="是否确认题目">
-          <el-radio-group v-model="form.is_sure_question">
-            <el-radio label="0">未确认</el-radio>
-            <el-radio label="1">已确认</el-radio>
-          </el-radio-group>
-        </el-form-item>
         <el-form-item class="myFooter">
           <el-button type="primary" @click="search">查询</el-button>
           <el-popconfirm
             title="确定删除当前考试下的所有分组吗？"
             @confirm="delGroup"
-            v-if="$store.getters.info.role === 'superAdmin'"
           >
             <el-button slot="reference" type="danger">删除分组</el-button>
           </el-popconfirm>
-          <el-button
-            type="primary"
-            size="medium"
-            @click="confirmCurGroup"
-            v-if="!isConfirmGroup"
-          >确认分组</el-button>
         </el-form-item>
       </el-form>
       <el-table :data="tableData">
         <el-table-column type="expand">
           <template slot-scope="props">
-            <el-table :data="getTableData(props.row.snos)" style="width: 100%" border>
+            <el-table
+              :data="getTableData(props.row.snos)"
+              style="width: 100%"
+              border
+            >
               <el-table-column prop="sname" label="学生姓名"></el-table-column>
               <el-table-column prop="sno" label="学号"></el-table-column>
             </el-table>
@@ -72,11 +62,27 @@
         </el-table-column>
         <el-table-column prop="groupid" label="组号"></el-table-column>
         <el-table-column prop="rank" label="所属分级"></el-table-column>
-        <el-table-column prop="weakpoints_and_rate" label="薄弱知识点信息"></el-table-column>
-        <!-- <el-table-column prop="snos" label="学生学号"> </el-table-column> -->
+        <el-table-column prop="weakpoints_and_rate" label="薄弱知识点信息">
+          <template slot-scope="scope">
+            <div>
+              <el-button size="mini" @click="showPoint(scope.row)"
+                >查看</el-button
+              >
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="是否确认学生">
           <template slot-scope="scope">
-            <div>{{ +scope.row.is_sure_student === 0 ? "未确认" : "已确认" }}</div>
+            <div>
+              <el-button
+                v-if="+scope.row.is_sure_student === 0"
+                size="mini"
+                type="primary"
+                @click="confirmCurGroup(scope.row)"
+                >确认分组</el-button
+              >
+              <span v-else>已确认</span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="是否确认题目">
@@ -86,21 +92,37 @@
                 v-if="+scope.row.is_sure_question === 0"
                 size="mini"
                 @click="handleShowQues(scope.row)"
-              >确认试题</el-button>
-              <el-button v-else size="mini" @click="handleShowQues(scope.row)">查看推荐试题</el-button>
+                type="primary"
+                >确认试题</el-button
+              >
+              <el-button v-else size="mini" @click="handleShowQues(scope.row)"
+                >查看推荐试题</el-button
+              >
             </div>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button size="mini" @click="handleShowQues(scope.row)"
-              >查看推荐试题</el-button
-            >
-          </template>
-        </el-table-column>-->
       </el-table>
-      <el-dialog title="确认分组" :visible.sync="dialogFormVisible" width="650px">
-        <ConfirmGroup :form="form" :groupData="tableData" @getConfirmStatus="getConfirmStatus"></ConfirmGroup>
+      <el-dialog
+        title="确认当前分组"
+        :visible.sync="dialogFormVisible"
+        width="650px"
+      >
+        <ConfirmGroup
+          :form="form"
+          :groupData="tableData"
+          @getConfirmStatus="getConfirmStatus"
+          :curGroupData="curGroupData"
+        ></ConfirmGroup>
+      </el-dialog>
+      <el-dialog
+        title="薄弱知识点信息"
+        :visible.sync="dialogPoint"
+        width="650px"
+      >
+        <el-table :data="gridData">
+          <el-table-column property="weakpoint" label="薄弱知识点"></el-table-column>
+          <el-table-column property="rate" label="正确率"></el-table-column>
+        </el-table>
       </el-dialog>
     </div>
     <RecommendQues v-else :curGroupData="curGroupData"></RecommendQues>
@@ -114,17 +136,15 @@ export default {
   name: "group-table",
   components: {
     RecommendQues: RecommendQues,
-    ConfirmGroup: ConfirmGroup
+    ConfirmGroup: ConfirmGroup,
   },
   data() {
     return {
       dialogFormVisible: false,
+      dialogPoint: false,
       form: {
         level: new Date().getFullYear() + "",
         cno: "",
-        exam_detail_id: "",
-        is_sure_student: "0",
-        is_sure_question: "0"
       },
       formDialog: {},
       updateDate: {},
@@ -134,7 +154,7 @@ export default {
       classList: [],
       studentMap: {},
       curGroupData: null,
-      isConfirmGroup: true
+      gridData: [],
     };
   },
   beforeRouteLeave(to, from, next) {
@@ -148,43 +168,37 @@ export default {
   computed: {
     groupLevel() {
       return this.$store.getters.groupLevel;
-    }
+    },
   },
   watch: {
     groupLevel(n, m) {
       if (n === "group") {
         this.search();
       }
-    }
+    },
   },
   methods: {
     getList() {
       if (this.examSub.length === 0) {
         return this.$message.error("请选择考试科目");
       }
-      this.isConfirmGroup = true;
       this.$request
         .fetchSearchgroup({
-          ...this.form,
-          exam_detail_id: this.examSub[1]
+          level: this.form.level,
+          cno: this.form.cno,
+          exam_detail_id: this.examSub[1],
         })
-        .then(res => {
+        .then((res) => {
           this.tableData = res.data.result;
-          for (let i = 0; i < this.tableData.length; i++) {
-            console.log(this.tableData[i]["is_sure_student"]);
-            if (+this.tableData[i]["is_sure_student"] === 0) {
-              this.isConfirmGroup = false;
-            }
-          }
         });
     },
     getClassList() {
       this.$request
         .fetchSearchClass({
           level: this.form.level,
-          headteacher: ""
+          headteacher: "",
         })
-        .then(res => {
+        .then((res) => {
           const result = res.data.result;
           this.classList = result;
           if (result.length > 0) {
@@ -195,7 +209,7 @@ export default {
     getExamList() {
       this.$request
         .fetchSelectExam({})
-        .then(res => {
+        .then((res) => {
           this.options = [];
           const result = res.data.result;
           result.map(async (item, index) => {
@@ -203,28 +217,28 @@ export default {
             this.options.push({
               value: item.exam_id,
               label: item.name,
-              children: []
+              children: [],
             });
-            sub.map(subItem => {
+            sub.map((subItem) => {
               this.options[index].children.push({
                 value: subItem.exam_detail_id,
-                label: subItem.subject_name
+                label: subItem.subject_name,
               });
             });
             return item;
           });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
     getExam_subjectList(id) {
       return this.$request
         .fetchSelectExamsubject({ exam_id: id })
-        .then(res => {
+        .then((res) => {
           return res.data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -234,9 +248,9 @@ export default {
         .fetchSearchStu({
           level: this.form.level,
           // cno: this.form.cno,
-          cno: ""
+          cno: "",
         })
-        .then(res => {
+        .then((res) => {
           const result = res.data.result;
           const obj = {};
           for (let i = 0; i < result.length; i++) {
@@ -244,7 +258,7 @@ export default {
           }
           this.studentMap = obj;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -264,10 +278,10 @@ export default {
         return [];
       }
       const data = snos.split(",");
-      return data.map(item => {
+      return data.map((item) => {
         return {
           sno: item,
-          sname: this.studentMap[item] ? this.studentMap[item]["sname"] : ""
+          sname: this.studentMap[item] ? this.studentMap[item]["sname"] : "",
         };
       });
     },
@@ -278,24 +292,22 @@ export default {
           is_sure_student: this.formDialog.is_sure_student,
           is_sure_question: this.formDialog.is_sure_question,
           groupid: this.formDialog.groupid,
-          snos: this.formDialog.snos
+          snos: this.formDialog.snos,
         })
-        .then(res => {
+        .then((res) => {
           this.dialogFormVisible = false;
           if (res.data.desc) {
             this.$message.error(res.data.desc);
           }
           this.search();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
-    confirmCurGroup() {
-      if (this.tableData.length === 0) {
-        return this.$message.error("请先查询要确认的分组");
-      }
+    confirmCurGroup(row) {
       this.dialogFormVisible = true;
+      this.curGroupData = row;
     },
     delGroup() {
       if (this.examSub.length === 0) {
@@ -303,12 +315,12 @@ export default {
       }
       this.$request
         .fetchDelgroup({ exam_detail_id: this.examSub[1] })
-        .then(res => {
+        .then((res) => {
           this.search();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success"
+            type: "success",
           });
         });
     },
@@ -319,8 +331,23 @@ export default {
     getConfirmStatus(status) {
       this.getList();
       this.dialogFormVisible = false;
-    }
-  }
+    },
+    showPoint(row) {
+      this.dialogPoint = true;
+      this.gridData = this.getWeakKnowledge(row.weakpoints_and_rate);
+    },
+    getWeakKnowledge(data) {
+      const arr = data.split("||");
+      const newArr = [];
+      for (let i = 0; i < arr.length; i++) {
+        newArr.push({
+          weakpoint: arr[i].split("_")[0],
+          rate: arr[i].split("_")[1] * 100 + "%",
+        });
+      }
+      return newArr;
+    },
+  },
 };
 </script>
 

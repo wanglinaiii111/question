@@ -38,13 +38,7 @@
               }}
             </span>
           </div>
-          <div
-            class="toolBtn"
-            v-if="
-              $store.getters.info.role === 'superAdmin' &&
-              +curGroupData.is_sure_question === 0
-            "
-          >
+          <div class="toolBtn" v-if="+curGroupData.is_sure_question === 0">
             <el-popconfirm
               title="确定删除这道题吗？"
               @confirm="deleteQues(item.id)"
@@ -71,6 +65,10 @@
             alt
           />
           <span v-else v-html="HtmlUtil.htmlDecodeByRegExp(item.answer)"></span>
+          <h4>知识点:</h4>
+          <span>{{
+            item.points.replace(/[\s]+/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
+          }}</span>
         </div>
       </el-card>
     </div>
@@ -79,7 +77,7 @@
 
 <script>
 import saveAs from "file-saver";
-import '../jquery.wordexport.js'
+import "../jquery.wordexport.js";
 import { HtmlUtil } from "../utils/htmlEncode";
 import { url } from "../api/urls/api";
 export default {
@@ -199,7 +197,9 @@ export default {
       this.$store.dispatch("setGroupLevel", "group");
     },
     download() {
-      $("#myHtml").wordExport(`${this.curGroupData.level}届-${this.curGroupData.cno}班-${this.curGroupData.groupid}组推荐试题`);
+      $("#myHtml").wordExport(
+        `${this.curGroupData.level}届-${this.curGroupData.cno}班-${this.curGroupData.groupid}组推荐试题`
+      );
     },
   },
 };

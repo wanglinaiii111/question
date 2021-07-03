@@ -8,15 +8,39 @@
         }}</el-checkbox>
       </template>
     </el-checkbox-group>
+    <el-divider></el-divider>
     <div v-for="item in groupData" :key="item.id" class="list">
-      <h3>{{ item.level }}-{{ item.cno }}-{{ item.groupid }}组</h3>
-      <el-button size="mini" class="btn" @click="add(item.id)"
-        >添加到当前分组</el-button
+      <div class="title">
+        <h3
+          :style="{
+            color: +item.id === +curGroupData.id ? '#409EFF' : '#606266',
+          }"
+        >
+          {{ item.level }}届-{{ item.cno }}班-{{ item.groupid }}组<Span
+            v-if="+item.id === +curGroupData.id"
+            >(当前修改的分组)</Span
+          >
+        </h3>
+        <div v-if="+item.is_sure_student === 0">
+          <el-button size="mini" class="btn" @click="add(item.id)"
+            >添加到当前分组</el-button
+          >
+          <el-button size="mini" class="btn" @click="del(item.id)"
+            >从当前分组删除</el-button
+          >
+        </div>
+        <div v-else>
+          <el-button size="mini" class="btn" disabled>已确认</el-button>
+        </div>
+      </div>
+      <h5>薄弱知识点</h5>
+      <div class="point">
+        {{ getWeakKnowledge(item.weakpoints_and_rate).join("、") }}
+      </div>
+      <el-checkbox-group
+        v-model="group['group' + item.id]"
+        :disabled="+item.is_sure_student === 1"
       >
-      <el-button size="mini" class="btn" @click="del(item.id)"
-        >从当前分组删除</el-button
-      >
-      <el-checkbox-group v-model="group['group' + item.id]">
         <el-checkbox
           v-for="stu in getStuList(item.snos)"
           :key="stu.sno"
@@ -24,6 +48,7 @@
           >{{ stu.sname }}</el-checkbox
         >
       </el-checkbox-group>
+      <el-divider></el-divider>
     </div>
     <el-popconfirm
       title="确定确认分组吗？确认后将不再可修改！"
@@ -39,7 +64,7 @@
 <script>
 export default {
   name: "confirm-group",
-  props: ["groupData", "form"],
+  props: ["groupData", "form", "curGroupData"],
   data() {
     const getGroupMap = () => {
       const obj = {};
@@ -55,6 +80,7 @@ export default {
     };
   },
   mounted() {
+    console.log(this.curGroupData, this.form);
     this.getStudentList();
   },
   methods: {
@@ -88,7 +114,7 @@ export default {
         });
     },
     add(id) {
-      const check = this.group["group" + id];
+      const check = this.checkList;
       for (let i = 0; i < check.length; i++) {
         this.studentList[check[i]] = {
           ...this.studentList[check[i]],
@@ -144,6 +170,7 @@ export default {
         arr.push(
           this.confirmUpdate(
             this.groupData[i]["id"],
+            this.groupData[i]["is_sure_student"],
             this.groupData[i]["is_sure_question"],
             this.groupData[i]["groupid"],
             this.groupData[i]["snos"]
@@ -158,11 +185,11 @@ export default {
           this.$message.error("确认失败");
         });
     },
-    confirmUpdate(id, is_sure_question, groupid, snos) {
+    confirmUpdate(id, is_sure_student, is_sure_question, groupid, snos) {
       this.$request
         .fetchUpdategroup({
           id: id,
-          is_sure_student: 1,
+          is_sure_student: +id === +this.curGroupData.id ? 1 : is_sure_student,
           is_sure_question: is_sure_question,
           groupid: groupid,
           snos: snos,
@@ -172,6 +199,14 @@ export default {
             this.$message.error(res.data.desc);
           }
         });
+    },
+    getWeakKnowledge(data) {
+      const arr = data.split("||");
+      const newArr = [];
+      for (let i = 0; i < arr.length; i++) {
+        newArr.push(arr[i].split("_")[0]);
+      }
+      return newArr;
     },
   },
 };
@@ -207,5 +242,15 @@ h3 {
 .list {
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.point {
+  margin: 5px 0 10px 0;
+  font-size: 12px;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

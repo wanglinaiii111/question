@@ -11,7 +11,26 @@
           @change="changeLevel"
         ></el-date-picker>
       </el-form-item>
-      <el-form-item label="考试名称" size="medium">
+      <el-form-item label="班号">
+        <el-select v-model="form.cno">
+          <el-option
+            v-for="item in classList"
+            :key="item.id"
+            :label="item.cno"
+            :value="item.cno"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="考试科目">
+        <el-cascader
+          :options="options"
+          v-model="form.examSub"
+          :show-all-levels="true"
+          @change="changeExamId"
+          size="medium"
+        ></el-cascader>
+      </el-form-item>
+      <!-- <el-form-item label="考试名称" size="medium">
         <el-select v-model="form.exam">
           <el-option
             v-for="item in examList"
@@ -31,13 +50,20 @@
             :value="item.subject_id"
           ></el-option>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
-        <el-button type="primary" @click="checkGrade">获取分组</el-button>
+        <el-button type="primary" @click="getGroupBtn">获取分组</el-button>
       </el-form-item>
     </el-form>
-    <GroupTable v-if="isGetGroup" :studentMap="studentMap" :tableData="tableData"></GroupTable>
-    <el-dialog title="以下班级没有上传成绩单，是否确认获取分组？" :visible.sync="dialogTableVisible">
+    <!-- <GroupTable
+      v-if="isGetGroup"
+      :studentMap="studentMap"
+      :tableData="tableData"
+    ></GroupTable> -->
+    <el-dialog
+      title="以下班级没有上传成绩单，是否确认获取分组？"
+      :visible.sync="dialogTableVisible"
+    >
       <el-table :data="no_upload_grade_cno">
         <el-table-column property="level" label="年级"></el-table-column>
         <el-table-column property="cno" label="班号"></el-table-column>
@@ -51,28 +77,27 @@
 </template>
 
 <script>
-import GroupTable from "./groupTable.vue";
+// import GroupTable from "./groupTable.vue";
 export default {
   name: "addgroup",
-  components: {
-    GroupTable: GroupTable
-  },
+  // components: {
+  //   GroupTable: GroupTable,
+  // },
   data() {
     return {
       form: {
-        exam: "",
-        examSub: "",
-        level: new Date().getFullYear() + ""
+        examSub: [],
+        level: new Date().getFullYear() + "",
+        cno: "",
       },
       dialogTableVisible: false,
-      examList: [],
-      examsubjectList: [],
       classList: [],
       no_upload_grade_cno: [],
-      studentMap: {},
-      tableData: [],
-      isGetGroup: false,
-      examDetailIdMap: {}
+      // studentMap: {},
+      // tableData: [],
+      // isGetGroup: false,
+      examSubMap: {},
+      options: [],
     };
   },
   mounted() {
@@ -83,34 +108,40 @@ export default {
     getExamList() {
       this.$request
         .fetchSelectExam({})
-        .then(res => {
-          this.examList = res.data.result;
-          if (res.data.result.length > 0) {
-            const id = res.data.result[0].exam_id;
-            this.getExamSubList(id);
-            this.form.exam = id;
-          }
+        .then((res) => {
+          this.options = [];
+          const result = res.data.result;
+          result.map(async (item, index) => {
+            const sub = await this.getExam_subjectList(item.exam_id);
+            this.options.push({
+              value: item.exam_id,
+              label: item.name,
+              children: [],
+            });
+            sub.map((subItem) => {
+              this.options[index].children.push({
+                value: subItem.exam_detail_id,
+                label: subItem.subject_name,
+              });
+            });
+            return item;
+          });
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
-    getExamSubList(id) {
-      this.$request
+    getExam_subjectList(id) {
+      return this.$request
         .fetchSelectExamsubject({ exam_id: id })
-        .then(res => {
-          this.examsubjectList = res.data;
+        .then((res) => {
           for (let i = 0; i < res.data.length; i++) {
-            this.examDetailIdMap[
-              `${res.data[i]["exam_id"]}-${res.data[i]["subject_id"]}`
-            ] = res.data[i]["exam_detail_id"];
+            this.examSubMap[res.data[i]["exam_detail_id"]] =
+              res.data[i]["subject_id"];
           }
-          if (res.data.length > 0) {
-            const id = res.data[0].subject_id;
-            this.form.examSub = id;
-          }
+          return res.data;
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     },
@@ -118,85 +149,105 @@ export default {
       this.$request
         .fetchSearchClass({
           level: this.form.level,
-          headteacher: ""
+          headteacher: "",
         })
-        .then(res => {
-          this.classList = res.data.result;
+        .then((res) => {
+          const result = res.data.result;
+          this.classList = result;
+          if (result.length > 0) {
+            this.form.cno = result[0].cno;
+          }
+        });
+    },
+    getGroupBtn() {
+      if (this.examSub.length === 0) {
+        return this.$message.error("请选择考试科目");
+      }
+      this.getGroupList();
+    },
+    getGroupList() {
+      // this.isConfirmGroup = true;
+      this.$request
+        .fetchSearchgroup({
+          level: this.form.level,
+          cno: this.form.cno,
+          exam_detail_id: this.examSub[1],
+        })
+        .then((res) => {
+          if (res.data.result.length > 0) {
+            return this.$message.error(
+              "当前考试已获取过分组，请去分组查询页面查看！"
+            );
+          }
+          this.checkGrade();
+          // this.getStudentList();
+
+          // this.tableData = res.data.result;
+          // for (let i = 0; i < this.tableData.length; i++) {
+          //   if (+this.tableData[i]["is_sure_student"] === 0) {
+          //     this.isConfirmGroup = false;
+          //   }
+          // }
         });
     },
     checkGrade() {
-      const examDetailId = this.examDetailIdMap[
-        `${this.form.exam}-${this.form.examSub}`
-      ];
-      this.getStudentList();
       this.$request
         .fetchCheckreport({
-          exam_detail_id: examDetailId
+          exam_detail_id: this.form.examSub[1],
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.examid === "" || res.data.examid === null) {
             return this.$message.error("当前年级没有班级上传成绩单");
           }
           const cnos = res.data.no_upload_grade_cno;
           this.dialogTableVisible = true;
-          this.no_upload_grade_cno = cnos.map(item => {
+          this.no_upload_grade_cno = cnos.map((item) => {
             return { cno: item, level: res.data.level };
           });
-          console.log(this.no_upload_grade_cno);
         });
     },
     pushreport() {
-      const examDetailId = this.examDetailIdMap[
-        `${this.form.exam}-${this.form.examSub}`
-      ];
       this.$request
         .fetchPushreport({
           grade_file_name_list: this.getGrade(),
-          exam_detail_id: examDetailId,
-          subject_id: this.form.examSub,
-          level: this.form.level
+          exam_detail_id: this.form.examSub[1],
+          subject_id: this.examSubMap[this.form.examSub[1]],
+          level: this.form.level,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.desc !== "推送成功!") {
             this.$message.error(res.data.desc);
             return;
           }
+          this.getGroup();
         });
     },
     getGroup() {
-      const examDetailId = this.examDetailIdMap[
-        `${this.form.exam}-${this.form.examSub}`
-      ];
       this.$request
         .fetchGetgroup({
-          examName: examDetailId + ""
+          examName: this.form.examSub[1] + "",
         })
-        .then(res => {
-          this.isGetGroup = true;
-          this.tableData = res.data.data;
+        .then((res) => {
           this.saveGroup(res.data.data);
         });
     },
     saveGroup(data) {
-      const examDetailId = this.examDetailIdMap[
-        `${this.form.exam}-${this.form.examSub}`
-      ];
       this.$request
         .fetchAddgroup({
-          exam_detail_id: examDetailId,
-          glist: data
+          exam_detail_id: this.form.examSub[1],
+          glist: data,
         })
-        .then(res => {
+        .then((res) => {
           if (res.data.desc) {
             this.$message.error(res.data.desc);
             return;
           }
-          this.$message.success("获取成功");
+          this.$message.error("分组获取成功，请去分组查询页面查看！");
         });
     },
     getGrade() {
       const obj = {};
-      this.no_upload_grade_cno.map(item => {
+      this.no_upload_grade_cno.map((item) => {
         obj[item.cno] = item;
         return item;
       });
@@ -209,40 +260,37 @@ export default {
       }
       return arr;
     },
-    getStudentList() {
-      // 查询某一个年级的所有学生
-      this.$request
-        .fetchSearchStu({
-          level: this.form.level,
-          // cno: this.form.cno,
-          cno: ""
-        })
-        .then(res => {
-          const result = res.data.result;
-          const obj = {};
-          for (let i = 0; i < result.length; i++) {
-            obj[result[i].sno] = result[i];
-          }
-          this.studentMap = obj;
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    },
+    // getStudentList() {
+    //   // 查询某一个年级的所有学生
+    //   this.$request
+    //     .fetchSearchStu({
+    //       level: this.form.level,
+    //       cno: this.form.cno,
+    //     })
+    //     .then((res) => {
+    //       const result = res.data.result;
+    //       const obj = {};
+    //       for (let i = 0; i < result.length; i++) {
+    //         obj[result[i].sno] = result[i];
+    //       }
+    //       this.studentMap = obj;
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     });
+    // },
     confirm() {
       this.dialogTableVisible = false;
       this.pushreport();
-      this.getGroup();
     },
     changeLevel(val) {
       this.form.level = val;
       this.getClassList();
     },
-    changeExam(val) {
-      this.form.exam = val;
-      this.getExamSubList(val);
-    }
-  }
+    changeExamId(val) {
+      this.examSub = val;
+    },
+  },
 };
 </script>
 
