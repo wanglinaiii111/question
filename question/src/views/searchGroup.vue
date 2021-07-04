@@ -193,12 +193,13 @@ export default {
           exam_detail_id: this.examSub[1]
         })
         .then(res => {
-          const result = res.data.result;
-          this.tableData = result.map(item => {
+          let result = res.data.result;
+          result = result.map(item => {
             let snos;
             eval(`snos = ${item.snos.replace(/\(/g, "[").replace(/\)/g, "]")}`);
             return { ...item, snos };
           });
+          this.tableData = JSON.parse(JSON.stringify(result))
         });
     },
     getClassList() {
@@ -237,9 +238,6 @@ export default {
             return item;
           });
         })
-        .catch(error => {
-          console.log(error);
-        });
     },
     getExam_subjectList(id) {
       return this.$request
@@ -247,9 +245,6 @@ export default {
         .then(res => {
           return res.data;
         })
-        .catch(error => {
-          console.log(error);
-        });
     },
     getStudentList() {
       // 查询某一个年级的所有学生
@@ -267,9 +262,6 @@ export default {
           }
           this.studentMap = obj;
         })
-        .catch(error => {
-          console.log(error);
-        });
     },
     changeLevel(val) {
       this.form.level = val;
@@ -312,9 +304,6 @@ export default {
           }
           this.search();
         })
-        .catch(error => {
-          console.log(error);
-        });
     },
     confirmCurGroup(row) {
       this.dialogFormVisible = true;
