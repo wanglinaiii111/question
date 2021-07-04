@@ -1,0 +1,1 @@
+C:\Users\zhangw\.ssh\ssh -p 22 root@8.140.105.168 "cd /app/web/;7z x question-server.7z -y;pm2 reload all "

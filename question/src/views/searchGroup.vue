@@ -58,6 +58,7 @@
             >
               <el-table-column prop="sname" label="学生姓名"></el-table-column>
               <el-table-column prop="sno" label="学号"></el-table-column>
+              <el-table-column prop="score" label="能力值"></el-table-column>
             </el-table>
           </template>
         </el-table-column>
@@ -111,7 +112,7 @@
         <ConfirmGroup
           v-if="dialogFormVisible"
           :form="form"
-          :groupData="tableData"
+          :groupTableData="tableData"
           @getConfirmStatus="getConfirmStatus"
           :curGroupData="curGroupData"
         ></ConfirmGroup>
@@ -194,7 +195,12 @@ export default {
           exam_detail_id: this.examSub[1],
         })
         .then((res) => {
-          this.tableData = res.data.result;
+          const result = res.data.result;
+          this.tableData = result.map(item=>{
+            let snos;
+            eval(`snos = ${item.snos.replace(/\(/g,'[').replace(/\)/g,']')}`);
+            return {...item,snos}
+          })
         });
     },
     getClassList() {
@@ -282,11 +288,11 @@ export default {
       if (!snos) {
         return [];
       }
-      const data = snos.split(",");
-      return data.map((item) => {
+      return snos.map((item) => {
         return {
-          sno: item,
-          sname: this.studentMap[item] ? this.studentMap[item]["sname"] : "",
+          sno: item[0],
+          score: item[1],
+          sname: this.studentMap[item[0]] ? this.studentMap[item[0]]["sname"] : "",
         };
       });
     },

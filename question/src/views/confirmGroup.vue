@@ -64,19 +64,22 @@
 <script>
 export default {
   name: "confirm-group",
-  props: ["groupData", "form", "curGroupData"],
+  props: ["groupTableData", "form", "curGroupData"],
   data() {
     const getGroupMap = () => {
       const obj = {};
-      for (let i = 0; i < this.groupData.length; i++) {
-        obj["group" + this.groupData[i]["id"]] = [];
+      const newArr = []
+      for (let i = 0; i < this.groupTableData.length; i++) {
+        obj["group" + this.groupTableData[i]["id"]] = [];
+        newArr.push({...this.groupTableData[i]})
       }
-      return obj;
+      return {obj,list:newArr};
     };
     return {
       checkList: [],
-      group: getGroupMap(),
+      group: getGroupMap()['obj'],
       studentList: {},
+      groupData:getGroupMap()['list'],
     };
   },
   mounted() {
@@ -99,8 +102,12 @@ export default {
           this.studentList = obj;
           const arr = [];
           for (let i = 0; i < this.groupData.length; i++) {
-            const stuList = this.getStuList(this.groupData[i]["snos"]);
+            const snos = this.groupData[i]["snos"]
+            const stuList = this.getStuList(snos);
             arr.push(...stuList);
+            for(let j=0;j<snos.length;j++){
+              this.studentList[snos[j][0]] = {...this.studentList[snos[j][0]],score:snos[j][1]}
+            }
           }
           for (let j = 0; j < arr.length; j++) {
             if (this.studentList[arr[j]["sno"]]) {
@@ -131,9 +138,11 @@ export default {
       check = [...check, ...cl];
       for (let i = 0; i < this.groupData.length; i++) {
         if (this.groupData[i]["id"] === id && check.length > 0) {
-          this.groupData[i]["snos"] += `${
-            this.groupData[i]["snos"] ? "," : ""
-          }${check.join(",")}`;
+          const newSnos = []
+          for(let j=0;j<check.length;j++){
+            newSnos.push([check[j]+'',this.studentList[check[j]].score])
+          }
+          this.groupData[i]["snos"] = [...this.groupData[i]["snos"],...newSnos]
         }
       }
       this.checkList = [];
@@ -151,9 +160,9 @@ export default {
           const arr = this.getStuList(this.groupData[i]["snos"]);
           const filterArr = arr.filter((item) => !check.includes(item["sno"]));
           const newArr = filterArr.map((item) => {
-            return item["sno"];
+            return [item["sno"],item["score"]];
           });
-          this.groupData[i]["snos"] = newArr.join(",");
+          this.groupData[i]["snos"] = newArr;
         }
       }
       this.group["group" + id] = [];
@@ -162,12 +171,12 @@ export default {
       if (!snos) {
         return [];
       }
-      const data = snos.split(",");
-      return data.map((item) => {
+      return snos.map((item) => {
         return {
-          sno: item,
-          sname: this.studentList[item]
-            ? this.studentList[item]["sname"]
+          sno: item[0],
+          score:item[1],
+          sname: this.studentList[item[0]]
+            ? this.studentList[item[0]]["sname"]
             : "未知",
         };
       });
@@ -175,13 +184,18 @@ export default {
     confirmBtn() {
       const arr = [];
       for (let i = 0; i < this.groupData.length; i++) {
+        const snos = this.groupData[i]["snos"];
+        let arr = []
+        for(let j=0;j<snos.length;j++){
+          arr.push(`(${snos[j][0]},${snos[j][1]})`)
+        }
         arr.push(
           this.confirmUpdate(
             this.groupData[i]["id"],
             this.groupData[i]["is_sure_student"],
             this.groupData[i]["is_sure_question"],
             this.groupData[i]["groupid"],
-            this.groupData[i]["snos"]
+            `[${arr.join()}]`
           )
         );
       }
