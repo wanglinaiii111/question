@@ -1,63 +1,68 @@
 <template>
   <div>
-    <h3>未分组学生列表</h3>
-    <el-checkbox-group v-model="checkList">
+    <h3
+      :style="{
+        color: '#409EFF'
+      }"
+    >
+      未分组学生列表
+    </h3>
+    <el-checkbox-group v-model="checkList" class="wfz">
       <template v-for="item in Object.values(studentList)">
-        <el-checkbox :key="item.id" :label="item.sno" v-if="!item.isGroup">{{
-          item.sname
-        }}</el-checkbox>
+        <el-checkbox :key="item.id" :label="item.sno" v-if="!item.isGroup">
+          <span v-if="item.sname">{{ item.sname }}</span>
+          <span v-else>未知</span>
+        </el-checkbox>
       </template>
     </el-checkbox-group>
     <el-divider></el-divider>
     <div v-for="item in groupData" :key="item.id" class="list">
-      <div class="title">
-        <h3
-          :style="{
-            color: +item.id === +curGroupData.id ? '#409EFF' : '#606266',
-          }"
-        >
-          {{ item.level }}届-{{ item.cno }}班-{{ item.groupid }}组<Span
-            v-if="+item.id === +curGroupData.id"
-            >(当前修改的分组)</Span
+      <div v-if="+item.id === +curGroupData.id">
+        <div class="title">
+          <h3
+            :style="{
+              color: '#409EFF'
+            }"
           >
-        </h3>
-        <div v-if="+item.is_sure_student === 0">
-          <el-button size="mini" class="btn" @click="add(item.id)"
-            >添加到当前分组</el-button
-          >
-          <el-button size="mini" class="btn" @click="del(item.id)"
-            >从当前分组删除</el-button
-          >
+            {{ item.level }}届-{{ item.cno }}班-{{ item.groupid }}组
+          </h3>
+          <div>
+            <el-button size="mini" class="btn" @click="add(item.id)"
+              >添加到当前分组</el-button
+            >
+            <el-button size="mini" class="btn" @click="del(item.id)"
+              >从当前分组删除</el-button
+            >
+          </div>
         </div>
-        <div v-else>
-          <el-button size="mini" class="btn" disabled>已确认</el-button>
+        <h5>薄弱知识点</h5>
+        <div class="point">
+          <div
+            v-for="(weakItem, index) in getWeakKnowledge(
+              item.weakpoints_and_rate
+            )"
+            :key="weakItem"
+          >
+            {{ index + 1 }}、{{ weakItem }}
+          </div>
         </div>
-      </div>
-      <h5>薄弱知识点</h5>
-      <div class="point">
-        {{ getWeakKnowledge(item.weakpoints_and_rate).join("、") }}
-      </div>
-      <el-checkbox-group
-        v-model="group['group' + item.id]"
-        :disabled="+item.is_sure_student === 1"
-      >
-        <el-checkbox
-          v-for="stu in getStuList(item.snos)"
-          :key="stu.sno"
-          :label="stu.sno"
-          >{{ stu.sname }}</el-checkbox
+        <el-checkbox-group
+          v-model="group['group' + item.id]"
+          :disabled="+item.is_sure_student === 1"
         >
-      </el-checkbox-group>
-      <el-divider></el-divider>
+          <el-checkbox
+            v-for="stu in getStuList(item.snos)"
+            :key="stu.sno"
+            :label="stu.sno"
+            >{{ stu.sname }}</el-checkbox
+          >
+        </el-checkbox-group>
+        <el-divider></el-divider>
+      </div>
     </div>
-    <el-popconfirm
-      title="确定确认分组吗？确认后将不再可修改！"
-      @confirm="confirmBtn()"
+    <el-button type="primary" size="medium" @click="confirmBtn()"
+      >确认分组</el-button
     >
-      <el-button type="primary" size="medium" slot="reference"
-        >确认分组</el-button
-      >
-    </el-popconfirm>
   </div>
 </template>
 
@@ -68,22 +73,25 @@ export default {
   data() {
     const getGroupMap = () => {
       const obj = {};
-      const newArr = []
+      const newArr = [];
       for (let i = 0; i < this.groupTableData.length; i++) {
         obj["group" + this.groupTableData[i]["id"]] = [];
-        newArr.push({...this.groupTableData[i]})
+        newArr.push({ ...this.groupTableData[i] });
       }
-      return {obj,list:newArr};
+      return { obj, list: newArr };
     };
     return {
       checkList: [],
-      group: getGroupMap()['obj'],
+      group: getGroupMap()["obj"],
       studentList: {},
-      groupData:getGroupMap()['list'],
+      groupData: getGroupMap()["list"],
+      id: null
     };
   },
   mounted() {
+    console.log(this.form, this.curGroupData);
     this.getStudentList();
+    this.getNoGroupStu();
   },
   methods: {
     getStudentList() {
@@ -91,9 +99,9 @@ export default {
       this.$request
         .fetchSearchStu({
           level: this.form.level,
-          cno: this.form.cno,
+          cno: this.form.cno
         })
-        .then((res) => {
+        .then(res => {
           const result = res.data.result;
           const obj = {};
           for (let i = 0; i < result.length; i++) {
@@ -102,21 +110,104 @@ export default {
           this.studentList = obj;
           const arr = [];
           for (let i = 0; i < this.groupData.length; i++) {
-            const snos = this.groupData[i]["snos"]
+            const snos = this.groupData[i]["snos"];
             const stuList = this.getStuList(snos);
             arr.push(...stuList);
-            for(let j=0;j<snos.length;j++){
-              this.studentList[snos[j][0]] = {...this.studentList[snos[j][0]],score:snos[j][1]}
+            for (let j = 0; j < snos.length; j++) {
+              this.studentList[snos[j][0]] = {
+                ...this.studentList[snos[j][0]],
+                score: snos[j][1]
+              };
             }
           }
           for (let j = 0; j < arr.length; j++) {
             if (this.studentList[arr[j]["sno"]]) {
               this.studentList[arr[j]["sno"]] = {
                 ...this.studentList[arr[j]["sno"]],
-                isGroup: true,
+                isGroup: true
               };
             }
           }
+        });
+    },
+    getNoGroupStu() {
+      this.$request
+        .fetchSelnogroup({
+          level: this.form.level,
+          cno: this.form.cno,
+          exam_detail_id: this.form.examSub[1]
+        })
+        .then(res => {
+          console.log(res.data);
+          const result = res.data;
+          console.log(result.id);
+          this.id = result.id;
+          if (result.sno_and_ability) {
+            let list;
+            eval(
+              `list = ${result.sno_and_ability
+                .replace(/\(/g, "[")
+                .replace(/\)/g, "]")}`
+            );
+            console.log(list);
+            for (let i = 0; i < list.length; i++) {
+              let stu = this.studentList[list[i][0]];
+              console.log(stu);
+              if (stu) {
+                console.log(stu);
+                this.studentList[list[i][0]] = {
+                  ...stu,
+                  score: list[i][1],
+                  isGroup: false
+                };
+              }
+            }
+            this.studentList = JSON.parse(JSON.stringify(this.studentList));
+            console.log(this.studentList);
+          }
+        });
+    },
+    addNoGroupStu() {
+      const arr = [];
+      for (const key in this.studentList) {
+        if (Object.hasOwnProperty.call(this.studentList, key)) {
+          const element = this.studentList[key];
+          if (!element.isGroup) {
+            arr.push([key, element.score]);
+            arr.push(`(${key},${element.score || 0})`);
+          }
+        }
+      }
+      this.$request
+        .fetchAddnogroup({
+          level: this.form.level,
+          cno: this.form.cno,
+          exam_detail_id: this.form.examSub[1],
+          sno_and_ability: `[${arr.join()}]`
+        })
+        .then(res => {
+          console.log(res.data);
+        });
+    },
+    updateNoGroupStu() {
+      const arr = [];
+      for (const key in this.studentList) {
+        if (Object.hasOwnProperty.call(this.studentList, key)) {
+          const element = this.studentList[key];
+          if (!element.isGroup) {
+            console.log(element);
+            arr.push(`(${key},${element.score || 0})`);
+          }
+        }
+      }
+      console.log(arr);
+      this.$request
+        .fetchUpdnogroup({
+          id: this.id ,
+          sno_and_ability: `[${arr.join()}]`
+        })
+        .then(res => {
+          console.log(res.data);
         });
     },
     add(id) {
@@ -124,7 +215,7 @@ export default {
       for (let i = 0; i < check.length; i++) {
         this.studentList[check[i]] = {
           ...this.studentList[check[i]],
-          isGroup: true,
+          isGroup: true
         };
       }
       const cl = [];
@@ -138,11 +229,14 @@ export default {
       check = [...check, ...cl];
       for (let i = 0; i < this.groupData.length; i++) {
         if (this.groupData[i]["id"] === id && check.length > 0) {
-          const newSnos = []
-          for(let j=0;j<check.length;j++){
-            newSnos.push([check[j]+'',this.studentList[check[j]].score])
+          const newSnos = [];
+          for (let j = 0; j < check.length; j++) {
+            newSnos.push([check[j] + "", this.studentList[check[j]].score]);
           }
-          this.groupData[i]["snos"] = [...this.groupData[i]["snos"],...newSnos]
+          this.groupData[i]["snos"] = [
+            ...this.groupData[i]["snos"],
+            ...newSnos
+          ];
         }
       }
       this.checkList = [];
@@ -152,15 +246,15 @@ export default {
       for (let i = 0; i < check.length; i++) {
         this.studentList[check[i]] = {
           ...this.studentList[check[i]],
-          isGroup: type === "delOther" ? true : false,
+          isGroup: type === "delOther" ? true : false
         };
       }
       for (let i = 0; i < this.groupData.length; i++) {
         if (+this.groupData[i]["id"] === +id) {
           const arr = this.getStuList(this.groupData[i]["snos"]);
-          const filterArr = arr.filter((item) => !check.includes(item["sno"]));
-          const newArr = filterArr.map((item) => {
-            return [item["sno"],item["score"]];
+          const filterArr = arr.filter(item => !check.includes(item["sno"]));
+          const newArr = filterArr.map(item => {
+            return [item["sno"], item["score"]];
           });
           this.groupData[i]["snos"] = newArr;
         }
@@ -171,33 +265,40 @@ export default {
       if (!snos) {
         return [];
       }
-      return snos.map((item) => {
+      return snos.map(item => {
         return {
           sno: item[0],
-          score:item[1],
+          score: item[1],
           sname: this.studentList[item[0]]
             ? this.studentList[item[0]]["sname"]
-            : "未知",
+            : "未知"
         };
       });
     },
     confirmBtn() {
+      console.log(this.id);
+      if (!this.id) {
+        this.addNoGroupStu();
+      } else {
+        this.updateNoGroupStu();
+      }
       const arr = [];
       for (let i = 0; i < this.groupData.length; i++) {
-        const snos = this.groupData[i]["snos"];
-        let arr = []
-        for(let j=0;j<snos.length;j++){
-          arr.push(`(${snos[j][0]},${snos[j][1]})`)
+        if (+this.groupData[i].id === +this.curGroupData.id) {
+          const snos = this.groupData[i]["snos"];
+          let arr = [];
+          for (let j = 0; j < snos.length; j++) {
+            arr.push(`(${snos[j][0]},${snos[j][1]})`);
+          }
+          arr.push(
+            this.confirmUpdate(
+              this.groupData[i]["id"],
+              this.groupData[i]["is_sure_question"],
+              this.groupData[i]["groupid"],
+              `[${arr.join()}]`
+            )
+          );
         }
-        arr.push(
-          this.confirmUpdate(
-            this.groupData[i]["id"],
-            this.groupData[i]["is_sure_student"],
-            this.groupData[i]["is_sure_question"],
-            this.groupData[i]["groupid"],
-            `[${arr.join()}]`
-          )
-        );
       }
       Promise.all(arr)
         .then(() => {
@@ -207,16 +308,16 @@ export default {
           this.$message.error("确认失败");
         });
     },
-    confirmUpdate(id, is_sure_student, is_sure_question, groupid, snos) {
+    confirmUpdate(id, is_sure_question, groupid, snos) {
       this.$request
         .fetchUpdategroup({
           id: id,
-          is_sure_student: +id === +this.curGroupData.id ? 1 : is_sure_student,
+          is_sure_student: 0,
           is_sure_question: is_sure_question,
           groupid: groupid,
-          snos: snos,
+          snos: snos
         })
-        .then((res) => {
+        .then(res => {
           if (res.data.desc) {
             this.$message.error(res.data.desc);
           }
@@ -229,8 +330,8 @@ export default {
         newArr.push(arr[i].split("_")[0]);
       }
       return newArr;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -274,5 +375,10 @@ h3 {
 .title {
   display: flex;
   justify-content: space-between;
+}
+</style>
+<style>
+.wfz .el-checkbox__label {
+  color: red;
 }
 </style>

@@ -1,5 +1,5 @@
 let url = "http://localhost:8002/";
-url = "./"; // 打包时配置
+// url = "./"; // 打包时配置
 
 let api = {
   // 登录post
@@ -67,6 +67,9 @@ let api = {
   getProblem: "intelligence/getProblem",
   addquestion: "intelligence/addquestion",
   delquestion: "intelligence/delquestion",
+  selnogroup: "intelligence/selnogroup",
+  addnogroup: "intelligence/addnogroup",
+  updnogroup: "intelligence/updnogroup",
   selectquestion: "intelligence/selectquestion",
   examQuesInsert: "exam/exampoints/insert",
   examQuesSelect: "exam/exampoints/select",

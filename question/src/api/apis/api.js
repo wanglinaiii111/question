@@ -217,6 +217,20 @@ export default {
       params: data
     });
   },
+  //查询未分组学生 GET
+  fetchSelnogroup(data) {
+    return axios.get(apiUrls.selnogroup, {
+      params: data
+    });
+  },
+  //添加未分组学生
+  fetchAddnogroup(data) {
+    return axios.post(apiUrls.addnogroup, data);
+  },
+  //修改未分组学生
+  fetchUpdnogroup(data) {
+    return axios.post(apiUrls.updnogroup, data);
+  },
   //查询小组试题 GET
   fetchSelectquestion(data) {
     return axios.get(apiUrls.selectquestion, {
