@@ -9,7 +9,10 @@
         class="addBtn"
         size="medium"
         slot="reference"
-        v-if="+curGroupData.is_sure_question === 0"
+        v-if="
+          $store.getters.info.role !== 'ordinary' &&
+          +curGroupData.is_sure_question === 0
+        "
         >确认试题</el-button
       >
     </el-popconfirm>
@@ -47,7 +50,11 @@
               title="确定删除这道题吗？"
               @confirm="deleteQues(item.id)"
             >
-              <el-button slot="reference" size="mini" type="danger"
+              <el-button
+                slot="reference"
+                size="mini"
+                type="danger"
+                v-if="$store.getters.info.role !== 'ordinary'"
                 >删除</el-button
               >
             </el-popconfirm>

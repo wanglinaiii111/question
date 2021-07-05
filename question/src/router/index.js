@@ -114,7 +114,7 @@ let addRouter = [
     path: "/",
     iconCls: "fa fa-group", // 图标样式class
     name: routeName.group,
-    meta: { role: ["superAdmin"], isShowTabNav: true },
+    meta: { role: ["superAdmin", "admin", "ordinary"], isShowTabNav: true },
     component: Layout,
     children: [
       {
@@ -123,7 +123,7 @@ let addRouter = [
         name: routeName.addGroup,
         component: addGroup,
         children: [],
-        meta: { role: ["superAdmin"], isShowTabNav: true }
+        meta: { role: ["superAdmin", "admin"], isShowTabNav: true }
       },
       {
         path: "/searchGroup",

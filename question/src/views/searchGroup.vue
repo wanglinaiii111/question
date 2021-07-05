@@ -44,7 +44,12 @@
             title="确定删除当前考试下的所有分组吗？"
             @confirm="delGroup"
           >
-            <el-button slot="reference" type="danger">删除分组</el-button>
+            <el-button
+              slot="reference"
+              type="danger"
+              v-if="$store.getters.info.role !== 'ordinary'"
+              >删除分组</el-button
+            >
           </el-popconfirm>
         </el-form-item>
       </el-form>
@@ -89,7 +94,10 @@
           <template slot-scope="scope">
             <div>
               <el-button
-                v-if="+scope.row.is_sure_question === 0"
+                v-if="
+                  $store.getters.info.role !== 'ordinary' &&
+                  +scope.row.is_sure_question === 0
+                "
                 size="mini"
                 @click="handleShowQues(scope.row)"
                 type="primary"
@@ -140,7 +148,7 @@ export default {
   name: "group-table",
   components: {
     RecommendQues: RecommendQues,
-    ConfirmGroup: ConfirmGroup
+    ConfirmGroup: ConfirmGroup,
   },
   data() {
     return {
@@ -148,7 +156,7 @@ export default {
       dialogPoint: false,
       form: {
         level: new Date().getFullYear() + "",
-        cno: ""
+        cno: "",
       },
       formDialog: {},
       updateDate: {},
@@ -158,7 +166,7 @@ export default {
       classList: [],
       studentMap: {},
       curGroupData: null,
-      gridData: []
+      gridData: [],
     };
   },
   beforeRouteLeave(to, from, next) {
@@ -172,14 +180,14 @@ export default {
   computed: {
     groupLevel() {
       return this.$store.getters.groupLevel;
-    }
+    },
   },
   watch: {
     groupLevel(n, m) {
       if (n === "group") {
         this.search();
       }
-    }
+    },
   },
   methods: {
     getList() {
@@ -190,25 +198,25 @@ export default {
         .fetchSearchgroup({
           level: this.form.level,
           cno: this.form.cno,
-          exam_detail_id: this.examSub[1]
+          exam_detail_id: this.examSub[1],
         })
-        .then(res => {
+        .then((res) => {
           let result = res.data.result;
-          result = result.map(item => {
+          result = result.map((item) => {
             let snos;
             eval(`snos = ${item.snos.replace(/\(/g, "[").replace(/\)/g, "]")}`);
             return { ...item, snos };
           });
-          this.tableData = JSON.parse(JSON.stringify(result))
+          this.tableData = JSON.parse(JSON.stringify(result));
         });
     },
     getClassList() {
       this.$request
         .fetchSearchClass({
           level: this.form.level,
-          headteacher: ""
+          headteacher: "",
         })
-        .then(res => {
+        .then((res) => {
           const result = res.data.result;
           this.classList = result;
           if (result.length > 0) {
@@ -217,34 +225,32 @@ export default {
         });
     },
     getExamList() {
-      this.$request
-        .fetchSelectExam({})
-        .then(res => {
-          this.options = [];
-          const result = res.data.result;
-          result.map(async (item, index) => {
-            const sub = await this.getExam_subjectList(item.exam_id);
-            this.options.push({
-              value: item.exam_id,
-              label: item.name,
-              children: []
-            });
-            sub.map(subItem => {
-              this.options[index].children.push({
-                value: subItem.exam_detail_id,
-                label: subItem.subject_name
-              });
-            });
-            return item;
+      this.$request.fetchSelectExam({}).then((res) => {
+        this.options = [];
+        const result = res.data.result;
+        result.map(async (item, index) => {
+          const sub = await this.getExam_subjectList(item.exam_id);
+          this.options.push({
+            value: item.exam_id,
+            label: item.name,
+            children: [],
           });
-        })
+          sub.map((subItem) => {
+            this.options[index].children.push({
+              value: subItem.exam_detail_id,
+              label: subItem.subject_name,
+            });
+          });
+          return item;
+        });
+      });
     },
     getExam_subjectList(id) {
       return this.$request
         .fetchSelectExamsubject({ exam_id: id })
-        .then(res => {
+        .then((res) => {
           return res.data;
-        })
+        });
     },
     getStudentList() {
       // 查询某一个年级的所有学生
@@ -252,16 +258,16 @@ export default {
         .fetchSearchStu({
           level: this.form.level,
           // cno: this.form.cno,
-          cno: ""
+          cno: "",
         })
-        .then(res => {
+        .then((res) => {
           const result = res.data.result;
           const obj = {};
           for (let i = 0; i < result.length; i++) {
             obj[result[i].sno] = result[i];
           }
           this.studentMap = obj;
-        })
+        });
     },
     changeLevel(val) {
       this.form.level = val;
@@ -278,13 +284,13 @@ export default {
       if (!snos) {
         return [];
       }
-      return snos.map(item => {
+      return snos.map((item) => {
         return {
           sno: item[0],
           score: item[1],
           sname: this.studentMap[item[0]]
             ? this.studentMap[item[0]]["sname"]
-            : ""
+            : "",
         };
       });
     },
@@ -295,17 +301,21 @@ export default {
           is_sure_student: this.formDialog.is_sure_student,
           is_sure_question: this.formDialog.is_sure_question,
           groupid: this.formDialog.groupid,
-          snos: this.formDialog.snos
+          snos: this.formDialog.snos,
         })
-        .then(res => {
+        .then((res) => {
           this.dialogFormVisible = false;
           if (res.data.desc) {
             this.$message.error(res.data.desc);
           }
           this.search();
-        })
+        });
     },
     confirmCurGroup(row) {
+      if (this.$store.getters.info.role === "ordinary") {
+        this.$message.error("您没有修改分组的权限！");
+        return;
+      }
       this.dialogFormVisible = true;
       this.curGroupData = row;
     },
@@ -317,14 +327,14 @@ export default {
         .fetchDelgroup({
           exam_detail_id: this.examSub[1],
           cno: this.form.cno,
-          level: this.form.level
+          level: this.form.level,
         })
-        .then(res => {
+        .then((res) => {
           this.search();
           this.$message({
             showClose: true,
             message: "删除成功！",
-            type: "success"
+            type: "success",
           });
         });
     },
@@ -346,12 +356,12 @@ export default {
       for (let i = 0; i < arr.length; i++) {
         newArr.push({
           weakpoint: arr[i].split("_")[0],
-          rate: arr[i].split("_")[1] * 100 + "%"
+          rate: arr[i].split("_")[1] * 100 + "%",
         });
       }
       return newArr;
-    }
-  }
+    },
+  },
 };
 </script>
 
