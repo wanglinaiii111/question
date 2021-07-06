@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-button class="back" size="medium" @click="back">返回上一级</el-button>
-    <el-button class="addBtn" size="medium" @click="dialogFormVisible = true"
+    <el-button class="addBtn" size="medium" @click="handleClickAdd"
       >添加试题</el-button
     >
     <el-table :data="tableData" style="width: 100%">
@@ -30,10 +30,10 @@
           <el-cascader
             :props="props"
             v-model="form.points"
-            :show-all-levels="true"
             @change="changePoint"
             size="medium"
             :key="form.subject_id"
+            :show-all-levels="false"
           ></el-cascader>
         </el-form-item>
         <el-form-item label="分数">
@@ -66,6 +66,7 @@ export default {
       props: {
         lazy: true,
         checkStrictly: true,
+        multiple: true,
         lazyLoad(node, resolve) {
           that.resolve = resolve;
           if (node.level === 0) {
@@ -116,13 +117,18 @@ export default {
     },
     confirm() {
       this.dialogFormVisible = false;
+      const arr = [];
+      for (let i = 0; i < this.form.points.length; i++) {
+        const e = this.form.points[i];
+        arr.push(e[e.length - 1]);
+      }
       this.$request
         .fetchExamQuesInsert({
           exam_detail_id: this.param.exam_detail_id,
           dataList: [
             {
               t_number: this.form.t_number,
-              points: this.form.points.join(";"),
+              points: arr.join(";"),
               scores: this.form.scores,
             },
           ],
@@ -134,6 +140,10 @@ export default {
           this.getList();
           this.$message.error("添加成功");
         });
+    },
+    handleClickAdd() {
+      this.dialogFormVisible = true;
+      this.form.points = [];
     },
     handleDelete(row) {
       this.$request
