@@ -8,7 +8,7 @@ const axios = require("axios");
 // create an axios instance
 exports.service = service = axios.create({
     baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-    timeout: 50000, // request timeout
+    timeout: 1000*60*10, // request timeout
 })
 
 // 添加请求拦截器

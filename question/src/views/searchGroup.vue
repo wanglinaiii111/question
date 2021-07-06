@@ -230,16 +230,17 @@ export default {
         const result = res.data.result;
         result.map(async (item, index) => {
           const sub = await this.getExam_subjectList(item.exam_id);
-          this.options.push({
-            value: item.exam_id,
-            label: item.name,
-            children: [],
-          });
+          const child = [];
           sub.map((subItem) => {
-            this.options[index].children.push({
+            child.push({
               value: subItem.exam_detail_id,
               label: subItem.subject_name,
             });
+          });
+          this.options.push({
+            value: item.exam_id,
+            label: item.name,
+            children: child,
           });
           return item;
         });

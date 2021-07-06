@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import NProgress from "nprogress";
 import { Message } from "element-ui";
 // axios默认配置
-axios.defaults.timeout = 10000; // 超时时间
+axios.defaults.timeout = 1000*60*10; // 超时时间
 axios.defaults.baseURL = "";
 axios.defaults.withCredentials = true;
 
