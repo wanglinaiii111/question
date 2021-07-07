@@ -38,7 +38,7 @@
       <el-table :data="tableData" style="width: 100%">
         <el-table-column prop="sname" label="学生姓名"></el-table-column>
         <el-table-column prop="sno" label="学号"></el-table-column>
-        <el-table-column prop="sex" label="性别"></el-table-column>
+        <!-- <el-table-column prop="sex" label="性别"></el-table-column> -->
         <el-table-column prop="level" label="年级"></el-table-column>
         <el-table-column prop="cno" label="班级"> </el-table-column>
         <el-table-column prop="headteacher" label="班主任"> </el-table-column>

@@ -357,7 +357,7 @@ export default {
       for (let i = 0; i < arr.length; i++) {
         newArr.push({
           weakpoint: arr[i].split("_")[0],
-          rate: arr[i].split("_")[1] * 100 + "%",
+          rate: parseInt(arr[i].split("_")[1] * 100) + "%",
         });
       }
       return newArr;
